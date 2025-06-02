@@ -347,26 +347,27 @@
       }
     }
 
-    async function connectWithWalletConnect() {
-      closeWalletModal();
-      try {
-        const provider = new WalletConnectProvider({
-          rpc: {
-            56: 'https://bsc-dataseed1.ninicoin.io/',
-            97: 'https://data-seed-prebsc-1-s1.binance.org:8545/',
-          },
-          chainId: 56,
-        });
-        await provider.enable();
-        web3 = new Web3(provider);
-        const accounts = await web3.eth.getAccounts();
-        userAccount = accounts[0];
-        await finalizeConnection();
-      } catch (error) {
-        console.error('Error connecting WalletConnect:', error);
-        showNotification(error.message || 'Failed to connect WalletConnect.', 'error');
-      }
-    }
+   async function connectWithWalletConnect() {
+  closeWalletModal();
+  try {
+    const provider = new WalletConnectProvider.default({
+      rpc: {
+        56: 'https://bsc-dataseed1.ninicoin.io/',
+        97: 'https://data-seed-prebsc-1-s1.binance.org:8545/',
+      },
+      chainId: 56,
+    });
+    await provider.enable();
+    web3 = new Web3(provider);
+    const accounts = await web3.eth Propriété
+
+    userAccount = accounts[0];
+    await finalizeConnection();
+  } catch (error) {
+    console.error('Error connecting WalletConnect:', error);
+    showNotification(error.message || 'Failed to connect WalletConnect.', 'error');
+  }
+}
 
     async function updateMomasBalance() {
       if (!userAccount || !web3 || !isNetworkValid) {
