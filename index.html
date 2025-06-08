@@ -159,8 +159,8 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-  <script src="/assets/walletconnect.min.js"></script>
-  
+  <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+
   <script>
     let userAccount;
     let rate = 10;
@@ -227,7 +227,7 @@
         {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},
         {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},
         {"inputs":[{"internalType":"uint256","name":"usdtAmount","type":"uint256"}],"name":"buyTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},
-        {"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}, // Thêm hàm balanceOf
+        {"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
         {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
         {"inputs":[],"name":"rate","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
         {"inputs":[],"name":"usdt","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"}
@@ -278,60 +278,70 @@
     async function init() {
       console.log('Page loaded, waiting for wallet connection');
       if (window.ethereum) {
+        console.log('MetaMask detected, attempting to connect...');
         await connectWallet();
       } else {
+        console.log('No MetaMask detected, showing wallet modal');
         showWalletModal();
       }
     }
 
     async function checkNetwork() {
-      const chainId = await web3.eth.getChainId();
-      const bscMainnetChainId = 56;
-      isNetworkValid = chainId === bscMainnetChainId;
-      const networkStatus = document.getElementById('networkStatus');
-      const approveButton = document.getElementById('approveButton');
-      if (isNetworkValid) {
-        networkStatus.innerText = 'Connected to BSC Mainnet';
-        networkStatus.style.color = '#00ff00';
-        approveButton.disabled = false;
-      } else {
-        networkStatus.innerText = 'Please switch to Binance Smart Chain Mainnet to proceed with transactions.';
-        networkStatus.style.color = '#ff0000';
-        approveButton.disabled = true;
-        showNotification('Please switch to Binance Smart Chain Mainnet in MetaMask.', 'error');
-        try {
-          await window.ethereum.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId: '0x38' }],
-          });
-        } catch (switchError) {
-          if (switchError.code === 4902) {
+      try {
+        const chainId = await web3.eth.getChainId();
+        const bscMainnetChainId = 56;
+        isNetworkValid = chainId === bscMainnetChainId;
+        const networkStatus = document.getElementById('networkStatus');
+        const approveButton = document.getElementById('approveButton');
+        if (isNetworkValid) {
+          networkStatus.innerText = 'Connected to BSC Mainnet';
+          networkStatus.style.color = '#00ff00';
+          approveButton.disabled = false;
+        } else {
+          networkStatus.innerText = 'Please switch to Binance Smart Chain Mainnet to proceed with transactions.';
+          networkStatus.style.color = '#ff0000';
+          approveButton.disabled = true;
+          showNotification('Please switch to Binance Smart Chain Mainnet in MetaMask.', 'error');
+          try {
             await window.ethereum.request({
-              method: 'wallet_addEthereumChain',
-              params: [
-                {
-                  chainId: '0x38',
-                  chainName: 'Binance Smart Chain Mainnet',
-                  rpcUrls: ['https://bsc-dataseed1.ninicoin.io/'],
-                  nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
-                  blockExplorerUrls: ['https://bscscan.com'],
-                },
-              ],
+              method: 'wallet_switchEthereumChain',
+              params: [{ chainId: '0x38' }],
             });
+          } catch (switchError) {
+            console.error('Switch network error:', switchError);
+            if (switchError.code === 4902) {
+              await window.ethereum.request({
+                method: 'wallet_addEthereumChain',
+                params: [
+                  {
+                    chainId: '0x38',
+                    chainName: 'Binance Smart Chain Mainnet',
+                    rpcUrls: ['https://bsc-dataseed1.ninicoin.io/'],
+                    nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+                    blockExplorerUrls: ['https://bscscan.com'],
+                  },
+                ],
+              });
+            }
           }
         }
+      } catch (error) {
+        console.error('Error checking network:', error);
+        showNotification('Failed to check network: ' + error.message, 'error');
       }
     }
 
     async function connectWallet() {
       try {
         if (window.ethereum) {
+          console.log('Initializing Web3 with MetaMask');
           web3 = new Web3(window.ethereum);
           const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          if (accounts.length === Santos344) {
+          if (accounts.length === 0) {
             throw new Error('No accounts returned. Please allow wallet connection.');
           }
           userAccount = accounts[0];
+          console.log('Connected account:', userAccount);
           await finalizeConnection();
         } else {
           throw new Error('No wallet detected. Please use WalletConnect.');
@@ -349,17 +359,22 @@
     async function connectWithWalletConnect() {
       try {
         closeWalletModal();
+        console.log('Connecting with WalletConnect...');
         const provider = new WalletConnectProvider.default({
           rpc: {
             56: 'https://bsc-dataseed1.ninicoin.io/',
-            97: 'https://data-seed-prebsc-1-s1.ninicoin.org:8545/',
+            97: 'https://data-seed-prebsc-1-s1.binance.org:8545/',
           },
           chainId: 56,
         });
         await provider.enable();
         web3 = new Web3(provider);
         const accounts = await web3.eth.getAccounts();
+        if (accounts.length === 0) {
+          throw new Error('No accounts returned from WalletConnect.');
+        }
         userAccount = accounts[0];
+        console.log('WalletConnect account:', userAccount);
         await finalizeConnection();
       } catch (error) {
         console.error('Error connecting WalletConnect:', error);
@@ -370,6 +385,7 @@
     async function updateMomasBalance() {
       if (!userAccount || !web3 || !isNetworkValid) {
         document.getElementById('momasBalance').innerText = '0.0';
+        console.log('Cannot update Momas balance: no userAccount or invalid network');
         return;
       }
       try {
@@ -377,7 +393,7 @@
         const balance = await contract.methods.balanceOf(userAccount).call();
         const momasBalance = Number(web3.utils.fromWei(balance, 'ether')); // Momas có 18 decimals
         document.getElementById('momasBalance').innerText = momasBalance.toFixed(2);
-        localStorage.setItem(`momasBalance_${userAccount}`, momasBalance.toString()); // Lưu vào localStorage
+        localStorage.setItem(`momasBalance_${userAccount}`, momasBalance.toString());
         console.log('Updated Momas balance:', momasBalance);
       } catch (error) {
         console.error('Error fetching Momas balance:', error);
@@ -400,7 +416,7 @@
         contract = new web3.eth.Contract(contractABI, contractAddress);
         try {
           const rawRate = await contract.methods.rate().call();
-          rate = Number(rawRate) / 1e12; // Điều chỉnh rate từ hợp đồng
+          rate = Number(rawRate) / 1e12;
           if (rate !== 10) {
             console.warn(`Rate từ hợp đồng (${rate}) không khớp với kỳ vọng (10). Kiểm tra hợp đồng!`);
           }
@@ -416,9 +432,11 @@
 
       if (window.ethereum) {
         window.ethereum.on('chainChanged', () => {
+          console.log('Chain changed, rechecking network');
           checkNetwork();
         });
         window.ethereum.on('accountsChanged', async (accounts) => {
+          console.log('Accounts changed:', accounts);
           if (accounts.length > 0) {
             userAccount = accounts[0];
             const shortAddress = `${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`;
@@ -448,8 +466,9 @@
         const usdtBalance = Number(web3.utils.fromWei(balance, 'ether'));
         document.getElementById('usdtBalance').innerText = usdtBalance.toFixed(2);
         document.getElementById('usdtAmount').max = usdtBalance;
+        console.log('Updated USDT balance:', usdtBalance);
       } catch (error) {
-        console.error('Error fetching balance:', error);
+        console.error('Error fetching USDT balance:', error);
         document.getElementById('usdtBalance').innerText = '0.0';
         showNotification('Failed to fetch USDT balance: ' + error.message, 'error');
       }
@@ -543,8 +562,8 @@
           showNotification('Momas purchased successfully!', 'success');
           document.getElementById('usdtAmount').value = '0';
           document.getElementById('momasAmount').innerText = '0.0';
-          await updateMomasBalance(); // Cập nhật số dư ngay sau khi mua
-          await updateBalance(); // Cập nhật số dư USDT
+          await updateMomasBalance();
+          await updateBalance();
         } else {
           throw new Error('Buy transaction failed.');
         }
@@ -607,7 +626,7 @@
 
     document.getElementById('connectButton').addEventListener('click', connectWallet);
     document.getElementById('approveButton').addEventListener('click', approveAndBuy);
-    
+
     let debounceTimeout;
     document.getElementById('usdtAmount').addEventListener('input', () => {
       clearTimeout(debounceTimeout);
