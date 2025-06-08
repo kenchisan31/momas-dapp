@@ -162,470 +162,463 @@
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <script src="/assets/walletconnect.min.js"></script>
   
-  <script>
-    let userAccount;
-    let rate = 10;
-    let web3;
-    let referralCode = '';
-    let isNetworkValid = false;
+ <script>
+  let userAccount;
+  let rate = 10;
+  let web3;
+  let referralCode = '';
+  let isNetworkValid = false;
+  let totalUsdtSpent = 0; // Tổng USDT đã chi, khởi tạo từ localStorage nếu có
 
-    const usdtContractABI = [
-      {
-        "constant": true,
-        "inputs": [{ "name": "_owner", "type": "address" }],
-        "name": "balanceOf",
-        "outputs": [{ "name": "balance", "type": "uint256" }],
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          { "name": "_spender", "type": "address" },
-          { "name": "_value", "type": "uint256" }
-        ],
-        "name": "approve",
-        "outputs": [{ "name": "success", "type": "bool" }],
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          { "name": "_owner", "type": "address" },
-          { "name": "_spender", "type": "address" }
-        ],
-        "name": "allowance",
-        "outputs": [{ "name": "remaining", "type": "uint256" }],
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          { "name": "_to", "type": "address" },
-          { "name": "_value", "type": "uint256" }
-        ],
-        "name": "transfer",
-        "outputs": [{ "name": "success", "type": "bool" }],
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          { "name": "_from", "type": "address" },
-          { "name": "_to", "type": "address" },
-          { "name": "_value", "type": "uint256" }
-        ],
-        "name": "transferFrom",
-        "outputs": [{ "name": "success", "type": "bool" }],
-        "type": "function"
-      }
-    ];
-
-    const contractAddress = '0xd3D61008559AcdE3bb6984431E77cA2Fd648aB02';
-    const usdtContractAddress = '0x55d398326f99059fF775485246999027B3197955';
-    const contractABI = [
-      {
-        "inputs":[{"internalType":"address","name":"_usdtAddress","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
-        {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},
-        {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},
-        {"inputs":[{"internalType":"uint256","name":"usdtAmount","type":"uint256"}],"name":"buyTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},
-        {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
-        {"inputs":[],"name":"rate","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-        {"inputs":[],"name":"usdt","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"}
-    ];
-    let contract;
-    let usdtContract;
-
-    function showNotification(message, type = 'info', autoClose = 3000) {
-      const notificationBox = document.getElementById('notificationBox');
-      const notificationMessage = document.getElementById('notificationMessage');
-      const notificationOverlay = document.getElementById('notificationOverlay');
-
-      notificationMessage.innerText = message;
-      notificationBox.className = `notification-box ${type}`;
-      notificationBox.style.display = 'block';
-      notificationOverlay.style.display = 'block';
-
-      if (autoClose) {
-        setTimeout(closeNotification, autoClose);
-      }
+  const usdtContractABI = [
+    {
+      "constant": true,
+      "inputs": [{ "name": "_owner", "type": "address" }],
+      "name": "balanceOf",
+      "outputs": [{ "name": "balance", "type": "uint256" }],
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        { "name": "_spender", "type": "address" },
+        { "name": "_value", "type": "uint256" }
+      ],
+      "name": "approve",
+      "outputs": [{ "name": "success", "type": "bool" }],
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        { "name": "_owner", "type": "address" },
+        { "name": "_spender", "type": "address" }
+      ],
+      "name": "allowance",
+      "outputs": [{ "name": "remaining", "type": "uint256" }],
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        { "name": "_to", "type": "address" },
+        { "name": "_value", "type": "uint256" }
+      ],
+      "name": "transfer",
+      "outputs": [{ "name": "success", "type": "bool" }],
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        { "name": "_from", "type": "address" },
+        { "name": "_to", "type": "address" },
+        { "name": "_value", "type": "uint256" }
+      ],
+      "name": "transferFrom",
+      "outputs": [{ "name": "success", "type": "bool" }],
+      "type": "function"
     }
+  ];
 
-    function closeNotification() {
-      const notificationBox = document.getElementById('notificationBox');
-      const notificationOverlay = document.getElementById('notificationOverlay');
+  const contractAddress = '0xd3D61008559AcdE3bb6984431E77cA2Fd648aB02';
+  const usdtContractAddress = '0x55d398326f99059fF775485246999027B3197955';
+  const contractABI = [
+    {
+      "inputs":[{"internalType":"address","name":"_usdtAddress","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
+      {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},
+      {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},
+      {"inputs":[{"internalType":"uint256","name":"usdtAmount","type":"uint256"}],"name":"buyTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},
+      {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+      {"inputs":[],"name":"rate","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+      {"inputs":[],"name":"usdt","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"}
+  ];
+  let contract;
+  let usdtContract;
 
-      notificationBox.style.display = 'none';
-      notificationOverlay.style.display = 'none';
-    }
+  function showNotification(message, type = 'info', autoClose = 3000) {
+    const notificationBox = document.getElementById('notificationBox');
+    const notificationMessage = document.getElementById('notificationMessage');
+    const notificationOverlay = document.getElementById('notificationOverlay');
 
-    function generateRandomCode(length = 8) {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      let code = '';
-      for (let i = 0; i < length; i++) {
-        code += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return code;
-    }
+    notificationMessage.innerText = message;
+    notificationBox.className = `notification-box ${type}`;
+    notificationBox.style.display = 'block';
+    notificationOverlay.style.display = 'block';
 
-    function showWalletModal() {
-      document.getElementById('walletModal').style.display = 'flex';
-    }
-
-    function closeWalletModal() {
-      document.getElementById('walletModal').style.display = 'none';
-    }
-
-    async function init() {
-      console.log('Page loaded, waiting for wallet connection');
-      if (window.ethereum) {
-        await connectWallet();
-      } else {
-        showWalletModal();
-      }
-    }
-
-    async function checkNetwork() {
-  const chainId = await web3.eth.getChainId();
-  const bscMainnetChainId = 56;
-  isNetworkValid = chainId === bscMainnetChainId;
-  const networkStatus = document.getElementById('networkStatus');
-  const approveButton = document.getElementById('approveButton');
-  approveButton.addEventListener('click', approveAndBuy);
-  approveButton.addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  approveAndBuy();
-});
-  if (isNetworkValid) {
-    networkStatus.innerText = 'Connected to BSC Mainnet';
-    networkStatus.style.color = '#00ff00';
-    approveButton.disabled = false;
-  } else {
-    networkStatus.innerText = 'Please switch to Binance Smart Chain Mainnet to proceed with transactions.';
-    networkStatus.style.color = '#ff0000';
-    approveButton.disabled = true;
-    showNotification('Please switch to Binance Smart Chain Mainnet in MetaMask.', 'error');
-    try {
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: '0x38' }],
-      });
-    } catch (switchError) {
-      if (switchError.code === 4902) {
-        await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [
-            {
-              chainId: '0x38',
-              chainName: 'Binance Smart Chain Mainnet',
-              rpcUrls: ['https://bsc-dataseed1.ninicoin.io/'],
-              nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
-              blockExplorerUrls: ['https://bscscan.com'],
-            },
-          ],
-        });
-      }
+    if (autoClose) {
+      setTimeout(closeNotification, autoClose);
     }
   }
-}
 
-    async function connectWallet() {
-      try {
-        if (window.ethereum) {
-          web3 = new Web3(window.ethereum);
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          if (accounts.length === 0) {
-            throw new Error('No accounts returned. Please allow wallet connection.');
-          }
-          userAccount = accounts[0];
-          await finalizeConnection();
-        } else {
-          throw new Error('No wallet detected. Please use WalletConnect.');
-        }
-      } catch (error) {
-        console.error('Error connecting wallet:', error);
-        if (error.message.includes('No wallet detected')) {
-          showWalletModal();
-        } else {
-          showNotification(error.message || 'Failed to connect wallet.', 'error');
-        }
-      }
-    }
+  function closeNotification() {
+    const notificationBox = document.getElementById('notificationBox');
+    const notificationOverlay = document.getElementById('notificationOverlay');
 
-   async function connectWithWalletConnect() {
-  closeWalletModal();
-  try {
-    const provider = new WalletConnectProvider.default({
-       projectId: 'b90083c2fef7850b1c00d5e99f12c030',
-      rpc: {
-        56: 'https://bsc-dataseed1.ninicoin.io/',
-        97: 'https://data-seed-prebsc-1-s1.binance.org:8545/',
-      },
-      chainId: 56,
-    });
-    await provider.enable();
-    web3 = new Web3(provider);
-    const accounts = await web3.eth.getAccounts()
-
-
-    userAccount = accounts[0];
-    await finalizeConnection();
-  } catch (error) {
-    console.error('Error connecting WalletConnect:', error);
-    showNotification(error.message || 'Failed to connect WalletConnect.', 'error');
+    notificationBox.style.display = 'none';
+    notificationOverlay.style.display = 'none';
   }
-}
 
-    async function updateMomasBalance() {
-      if (!userAccount || !web3 || !isNetworkValid) {
-        document.getElementById('momasBalance').innerText = '0.0';
-        return;
-      }
-      try {
-        contract = new web3.eth.Contract(contractABI, contractAddress);
-        const events = await contract.getPastEvents('Transfer', {
-          filter: { to: userAccount, from: '0x0000000000000000000000000000000000000000' }, // Mint events
-          fromBlock: 0,
-          toBlock: 'latest'
-        });
-
-        let totalMomas = 0;
-        for (const event of events) {
-          const amount = Number(web3.utils.fromWei(event.returnValues.value, 'ether')); // Momas có 18 decimals
-          totalMomas += amount;
-        }
-
-        document.getElementById('momasBalance').innerText = totalMomas.toFixed(2);
-        localStorage.setItem(`momasBalance_${userAccount}`, totalMomas.toString()); // Lưu vào localStorage để dự phòng
-      } catch (error) {
-        console.error('Error fetching Momas balance from events:', error);
-        const storedBalance = localStorage.getItem(`momasBalance_${userAccount}`) || '0';
-        document.getElementById('momasBalance').innerText = parseFloat(storedBalance).toFixed(2);
-        showNotification('Failed to fetch Momas balance from blockchain. Using local data.', 'error');
-      }
+  function generateRandomCode(length = 8) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let code = '';
+    for (let i = 0; i < length; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-
-    async function finalizeConnection() {
-      const button = document.getElementById('connectButton');
-      const shortAddress = `${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`;
-      button.innerText = shortAddress;
-
-      referralCode = generateRandomCode();
-      document.getElementById('referralLink').value = `https://yourapp.com/ref/${referralCode}`;
-
-      await checkNetwork();
-      if (isNetworkValid) {
-        contract = new web3.eth.Contract(contractABI, contractAddress);
-        try {
-          const rawRate = await contract.methods.rate().call();
-          rate = Number(rawRate) / 1e12; // Điều chỉnh rate từ hợp đồng: 10 * 1e12 -> 10
-          if (rate !== 10) {
-            console.warn(`Rate từ hợp đồng (${rate}) không khớp với kỳ vọng (10). Kiểm tra hợp đồng!`);
-          }
-        } catch (error) {
-          console.error('Error fetching rate from contract:', error);
-          showNotification('Failed to fetch rate from contract. Using default rate.', 'error');
-          rate = 10;
-        }
-        await updateBalance();
-        await updateMomasBalance();
-        await updateReferral();
-      }
-
-      if (window.ethereum) {
-        window.ethereum.on('chainChanged', () => {
-          checkNetwork();
-        });
-        window.ethereum.on('accountsChanged', async (accounts) => {
-          if (accounts.length > 0) {
-            userAccount = accounts[0];
-            const shortAddress = `${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`;
-            document.getElementById('connectButton').innerText = shortAddress;
-            document.getElementById('momasAmount').innerText = '0.0';
-            await updateBalance();
-            await updateMomasBalance();
-            await updateReferral();
-          } else {
-            userAccount = null;
-            document.getElementById('connectButton').innerText = 'Connect Wallet';
-            document.getElementById('usdtBalance').innerText = '0.0';
-            document.getElementById('momasBalance').innerText = '0.0';
-            document.getElementById('referralLink').value = '';
-            document.getElementById('referralCount').innerText = '0';
-            document.getElementById('momasAmount').innerText = '0.0';
-          }
-        });
-      }
-    }
-
-    async function updateBalance() {
-      if (!userAccount || !web3 || !isNetworkValid) return;
-      try {
-        usdtContract = new web3.eth.Contract(usdtContractABI, usdtContractAddress);
-        const balance = await usdtContract.methods.balanceOf(userAccount).call();
-        const usdtBalance = Number(web3.utils.fromWei(balance, 'ether'));
-        document.getElementById('usdtBalance').innerText = usdtBalance.toFixed(2);
-        document.getElementById('usdtAmount').max = usdtBalance;
-      } catch (error) {
-        console.error('Error fetching balance:', error);
-        document.getElementById('usdtBalance').innerText = '0.0';
-        showNotification('Failed to fetch USDT balance: ' + error.message, 'error');
-      }
-    }
-
-    async function updateReferral() {
-      if (!userAccount || !web3 || !isNetworkValid) return;
-      try {
-        contract = new web3.eth.Contract(contractABI, contractAddress);
-        const count = 0;
-        document.getElementById('referralCount').innerText = count || '0';
-      } catch (error) {
-        console.error('Error fetching referral count:', error);
-        document.getElementById('referralCount').innerText = '0';
-        showNotification('Failed to fetch referral count: ' + error.message, 'error');
-      }
-    }
-
-    function calculateMomas() {
-      const usdtAmount = parseFloat(document.getElementById('usdtAmount').value) || 0;
-      const momasAmount = usdtAmount * rate;
-      document.getElementById('momasAmount').innerText = momasAmount.toFixed(2);
-    }
-
-    function setMax() {
-      const input = document.getElementById('usdtAmount');
-      input.value = input.max || 100;
-      calculateMomas();
-    }
-
-   async function approveAndBuy() {
-  if (!isNetworkValid) {
-    showNotification('Please switch to Binance Smart Chain Mainnet.', 'error');
-    return;
+    return code;
   }
-  const button = document.getElementById('approveButton');
-  const usdtAmount = parseFloat(document.getElementById('usdtAmount').value) || 0;
-  if (usdtAmount <= 0) {
-    showNotification('Please enter a valid USDT amount!', 'error');
-    return;
+
+  function showWalletModal() {
+    document.getElementById('walletModal').style.display = 'flex';
   }
-  if (!userAccount || !web3) {
-    showNotification('Please connect your wallet!', 'error');
-    return;
+
+  function closeWalletModal() {
+    document.getElementById('walletModal').style.display = 'none';
   }
-  try {
-    button.disabled = true;
-    button.innerText = 'Approving USDT...';
-    usdtContract = new web3.eth.Contract(usdtContractABI, usdtContractAddress);
-    const balance = await usdtContract.methods.balanceOf(userAccount).call();
-    const amountInWei = web3.utils.toWei(usdtAmount.toString(), 'ether');
-    if (BigInt(balance) < BigInt(amountInWei)) {
-      throw new Error('Insufficient USDT balance! Please add more USDT.');
-    }
-    let gasApprove;
-    try {
-      gasApprove = await usdtContract.methods.approve(contractAddress, amountInWei).estimateGas({ from: userAccount });
-      gasApprove = Math.round(gasApprove * 1.2);
-    } catch (error) {
-      console.error('Gas estimation failed for approve:', error);
-      gasApprove = 100000;
-    }
-    const transaction = await usdtContract.methods.approve(contractAddress, amountInWei).send({
-      from: userAccount,
-      gas: gasApprove,
-    });
-    if (transaction.status) {
-      showNotification('USDT approved successfully!', 'success', 2000);
+
+  async function init() {
+    console.log('Page loaded, waiting for wallet connection');
+    if (window.ethereum) {
+      await connectWallet();
     } else {
-      throw new Error('Approval transaction failed.');
+      showWalletModal();
     }
-    button.innerText = 'Buying Momas...';
-    const allowance = await usdtContract.methods.allowance(userAccount, contractAddress).call();
-    if (BigInt(allowance) < BigInt(amountInWei)) {
-      throw new Error('Insufficient USDT allowance.');
+    // Load tổng USDT đã chi từ localStorage khi khởi động
+    const storedUsdtSpent = localStorage.getItem(`usdtSpent_${userAccount}`);
+    if (storedUsdtSpent) {
+      totalUsdtSpent = parseFloat(storedUsdtSpent);
+      const momasEarned = totalUsdtSpent * rate;
+      document.getElementById('momasBalance').innerText = momasEarned.toFixed(2);
+      console.log('Loaded USDT spent:', totalUsdtSpent, 'Momas earned:', momasEarned);
     }
-    contract = new web3.eth.Contract(contractABI, contractAddress);
-    let gasBuy;
-    try {
-      gasBuy = await contract.methods.buyTokens(amountInWei).estimateGas({ from: userAccount });
-      gasBuy = Math.round(gasBuy * 1.2);
-    } catch (error) {
-      console.error('Gas estimation failed for buy:', error);
-      gasBuy = 200000;
-    }
-    await contract.methods.buyTokens(amountInWei).send({
-      from: userAccount,
-      gas: gasBuy,
-    });
-    showNotification('Momas purchased successfully!', 'success');
-    document.getElementById('momasAmount').innerText = '0.0';
-    await updateMomasBalance();
-  } catch (error) {
-    console.error('Transaction error:', error);
-    let errorMessage = error.message || 'Transaction failed. Please try again.';
-    if (error.code === 4001) {
-      errorMessage = 'You rejected the transaction in MetaMask.';
-    } else if (error.message.includes('revert')) {
-      errorMessage = 'Transaction reverted. Please check contract or parameters.';
-    }
-    showNotification(errorMessage, 'error');
-  } finally {
-    button.disabled = false;
-    button.innerText = 'Approve and Buy Momas';
   }
-}
 
-    function showStake() {
-      document.querySelectorAll('.container').forEach(container => container.style.display = 'none');
-      document.getElementById('stake-section').style.display = 'block';
+  async function checkNetwork() {
+    const chainId = await web3.eth.getChainId();
+    const bscMainnetChainId = 56;
+    isNetworkValid = chainId === bscMainnetChainId;
+    const networkStatus = document.getElementById('networkStatus');
+    const approveButton = document.getElementById('approveButton');
+    approveButton.addEventListener('click', approveAndBuy);
+    approveButton.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      approveAndBuy();
+    });
+    if (isNetworkValid) {
+      networkStatus.innerText = 'Connected to BSC Mainnet';
+      networkStatus.style.color = '#00ff00';
+      approveButton.disabled = false;
+    } else {
+      networkStatus.innerText = 'Please switch to Binance Smart Chain Mainnet to proceed with transactions.';
+      networkStatus.style.color = '#ff0000';
+      approveButton.disabled = true;
+      showNotification('Please switch to Binance Smart Chain Mainnet in MetaMask.', 'error');
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x38' }],
+        });
+      } catch (switchError) {
+        if (switchError.code === 4902) {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              {
+                chainId: '0x38',
+                chainName: 'Binance Smart Chain Mainnet',
+                rpcUrls: ['https://bsc-dataseed1.ninicoin.io/'],
+                nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+                blockExplorerUrls: ['https://bscscan.com'],
+              },
+            ],
+          });
+        }
+      }
     }
+  }
 
-    function showReferral() {
-      document.querySelectorAll('.container').forEach(container => container.style.display = 'none');
-      document.getElementById('referral-section').style.display = 'block';
-      if (userAccount && referralCode) {
-        document.getElementById('referralLink').value = `https://yourapp.com/ref/${referralCode}`;
-        updateReferral();
+  async function connectWallet() {
+    try {
+      if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        if (accounts.length === 0) {
+          throw new Error('No accounts returned. Please allow wallet connection.');
+        }
+        userAccount = accounts[0];
+        await finalizeConnection();
       } else {
-        document.getElementById('referralLink').value = '';
+        throw new Error('No wallet detected. Please use WalletConnect.');
+      }
+    } catch (error) {
+      console.error('Error connecting wallet:', error);
+      if (error.message.includes('No wallet detected')) {
+        showWalletModal();
+      } else {
+        showNotification(error.message || 'Failed to connect wallet.', 'error');
       }
     }
+  }
 
-    function copyReferralLink() {
-      const referralLink = document.getElementById('referralLink');
-      if (!referralLink.value) {
-        showNotification('Please connect your wallet to get a referral link!', 'error');
-        return;
+  async function connectWithWalletConnect() {
+    closeWalletModal();
+    try {
+      const provider = new WalletConnectProvider.default({
+        projectId: 'b90083c2fef7850b1c00d5e99f12c030',
+        rpc: {
+          56: 'https://bsc-dataseed1.ninicoin.io/',
+          97: 'https://data-seed-prebsc-1-s1.binance.org:8545/',
+        },
+        chainId: 56,
+      });
+      await provider.enable();
+      web3 = new Web3(provider);
+      const accounts = await web3.eth.getAccounts();
+      userAccount = accounts[0];
+      await finalizeConnection();
+    } catch (error) {
+      console.error('Error connecting WalletConnect:', error);
+      showNotification(error.message || 'Failed to connect WalletConnect.', 'error');
+    }
+  }
+
+  async function updateMomasBalance() {
+    if (!userAccount || !web3 || !isNetworkValid) {
+      document.getElementById('momasBalance').innerText = '0.0';
+      return;
+    }
+    // Không cần lấy từ blockchain nữa, dùng totalUsdtSpent
+    const momasEarned = totalUsdtSpent * rate;
+    document.getElementById('momasBalance').innerText = momasEarned.toFixed(2);
+    localStorage.setItem(`momasBalance_${userAccount}`, momasEarned.toString()); // Lưu để đồng bộ
+    console.log('Updated Momas balance from USDT spent:', momasEarned);
+  }
+
+  async function finalizeConnection() {
+    const button = document.getElementById('connectButton');
+    const shortAddress = `${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`;
+    button.innerText = shortAddress;
+
+    referralCode = generateRandomCode();
+    document.getElementById('referralLink').value = `https://yourapp.com/ref/${referralCode}`;
+
+    await checkNetwork();
+    if (isNetworkValid) {
+      contract = new web3.eth.Contract(contractABI, contractAddress);
+      try {
+        const rawRate = await contract.methods.rate().call();
+        rate = Number(rawRate) / 1e12; // Điều chỉnh rate từ hợp đồng: 10 * 1e12 -> 10
+        if (rate !== 10) {
+          console.warn(`Rate từ hợp đồng (${rate}) không khớp với kỳ vọng (10). Kiểm tra hợp đồng!`);
+        }
+      } catch (error) {
+        console.error('Error fetching rate from contract:', error);
+        showNotification('Failed to fetch rate from contract. Using default rate.', 'error');
+        rate = 10;
       }
-      referralLink.select();
-      document.execCommand('copy');
-      showNotification('Referral link copied to clipboard!', 'success');
+      await updateBalance();
+      await updateMomasBalance();
+      await updateReferral();
     }
 
-    document.querySelectorAll('.taskbar-item').forEach(item => {
-      item.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (e.target.textContent === 'Stake') {
-          showStake();
-        } else if (e.target.textContent === 'Referral') {
-          showReferral();
-        } else if (e.target.textContent === 'Momas Network') {
-          showStake();
-        } else if (e.target.textContent === 'Documentation') {
-          showNotification('Documentation page not implemented yet!', 'info');
+    if (window.ethereum) {
+      window.ethereum.on('chainChanged', () => {
+        checkNetwork();
+      });
+      window.ethereum.on('accountsChanged', async (accounts) => {
+        if (accounts.length > 0) {
+          userAccount = accounts[0];
+          const shortAddress = `${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`;
+          document.getElementById('connectButton').innerText = shortAddress;
+          document.getElementById('momasAmount').innerText = '0.0';
+          await updateBalance();
+          await updateMomasBalance();
+          await updateReferral();
+        } else {
+          userAccount = null;
+          document.getElementById('connectButton').innerText = 'Connect Wallet';
+          document.getElementById('usdtBalance').innerText = '0.0';
+          document.getElementById('momasBalance').innerText = '0.0';
+          document.getElementById('referralLink').value = '';
+          document.getElementById('referralCount').innerText = '0';
+          document.getElementById('momasAmount').innerText = '0.0';
         }
       });
-    });
+    }
+  }
 
-    document.getElementById('connectButton').addEventListener('click', connectWallet);
-    document.getElementById('approveButton').addEventListener('click', approveAndBuy);
-    
-    let debounceTimeout;
-    document.getElementById('usdtAmount').addEventListener('input', () => {
-      clearTimeout(debounceTimeout);
-      debounceTimeout = setTimeout(calculateMomas, 300);
-    });
+  async function updateBalance() {
+    if (!userAccount || !web3 || !isNetworkValid) return;
+    try {
+      usdtContract = new web3.eth.Contract(usdtContractABI, usdtContractAddress);
+      const balance = await usdtContract.methods.balanceOf(userAccount).call();
+      const usdtBalance = Number(web3.utils.fromWei(balance, 'ether'));
+      document.getElementById('usdtBalance').innerText = usdtBalance.toFixed(2);
+      document.getElementById('usdtAmount').max = usdtBalance;
+    } catch (error) {
+      console.error('Error fetching balance:', error);
+      document.getElementById('usdtBalance').innerText = '0.0';
+      showNotification('Failed to fetch USDT balance: ' + error.message, 'error');
+    }
+  }
 
-    window.addEventListener('load', init);
-  </script>
+  async function updateReferral() {
+    if (!userAccount || !web3 || !isNetworkValid) return;
+    try {
+      contract = new web3.eth.Contract(contractABI, contractAddress);
+      const count = 0;
+      document.getElementById('referralCount').innerText = count || '0';
+    } catch (error) {
+      console.error('Error fetching referral count:', error);
+      document.getElementById('referralCount').innerText = '0';
+      showNotification('Failed to fetch referral count: ' + error.message, 'error');
+    }
+  }
+
+  function calculateMomas() {
+    const usdtAmount = parseFloat(document.getElementById('usdtAmount').value) || 0;
+    const momasAmount = usdtAmount * rate;
+    document.getElementById('momasAmount').innerText = momasAmount.toFixed(2);
+  }
+
+  function setMax() {
+    const input = document.getElementById('usdtAmount');
+    input.value = input.max || 100;
+    calculateMomas();
+  }
+
+  async function approveAndBuy() {
+    if (!isNetworkValid) {
+      showNotification('Please switch to Binance Smart Chain Mainnet.', 'error');
+      return;
+    }
+    const button = document.getElementById('approveButton');
+    const usdtAmount = parseFloat(document.getElementById('usdtAmount').value) || 0;
+    if (usdtAmount <= 0) {
+      showNotification('Please enter a valid USDT amount!', 'error');
+      return;
+    }
+    if (!userAccount || !web3) {
+      showNotification('Please connect your wallet!', 'error');
+      return;
+    }
+    try {
+      button.disabled = true;
+      button.innerText = 'Approving USDT...';
+      usdtContract = new web3.eth.Contract(usdtContractABI, usdtContractAddress);
+      const balance = await usdtContract.methods.balanceOf(userAccount).call();
+      const amountInWei = web3.utils.toWei(usdtAmount.toString(), 'ether');
+      if (BigInt(balance) < BigInt(amountInWei)) {
+        throw new Error('Insufficient USDT balance! Please add more USDT.');
+      }
+      let gasApprove;
+      try {
+        gasApprove = await usdtContract.methods.approve(contractAddress, amountInWei).estimateGas({ from: userAccount });
+        gasApprove = Math.round(gasApprove * 1.2);
+      } catch (error) {
+        console.error('Gas estimation failed for approve:', error);
+        gasApprove = 100000;
+      }
+      const transaction = await usdtContract.methods.approve(contractAddress, amountInWei).send({
+        from: userAccount,
+        gas: gasApprove,
+      });
+      if (transaction.status) {
+        showNotification('USDT approved successfully!', 'success', 2000);
+      } else {
+        throw new Error('Approval transaction failed.');
+      }
+      button.innerText = 'Buying Momas...';
+      const allowance = await usdtContract.methods.allowance(userAccount, contractAddress).call();
+      if (BigInt(allowance) < BigInt(amountInWei)) {
+        throw new Error('Insufficient USDT allowance.');
+      }
+      contract = new web3.eth.Contract(contractABI, contractAddress);
+      let gasBuy;
+      try {
+        gasBuy = await contract.methods.buyTokens(amountInWei).estimateGas({ from: userAccount });
+        gasBuy = Math.round(gasBuy * 1.2);
+      } catch (error) {
+        console.error('Gas estimation failed for buy:', error);
+        gasBuy = 200000;
+      }
+      await contract.methods.buyTokens(amountInWei).send({
+        from: userAccount,
+        gas: gasBuy,
+      });
+      showNotification('Momas purchased successfully!', 'success');
+      // Cập nhật tổng USDT đã chi và Momas
+      totalUsdtSpent += usdtAmount;
+      localStorage.setItem(`usdtSpent_${userAccount}`, totalUsdtSpent.toString());
+      await updateMomasBalance();
+      document.getElementById('momasAmount').innerText = '0.0';
+    } catch (error) {
+      console.error('Transaction error:', error);
+      let errorMessage = error.message || 'Transaction failed. Please try again.';
+      if (error.code === 4001) {
+        errorMessage = 'You rejected the transaction in MetaMask.';
+      } else if (error.message.includes('revert')) {
+        errorMessage = 'Transaction reverted. Please check contract or parameters.';
+      }
+      showNotification(errorMessage, 'error');
+    } finally {
+      button.disabled = false;
+      button.innerText = 'Approve and Buy Momas';
+    }
+  }
+
+  function showStake() {
+    document.querySelectorAll('.container').forEach(container => container.style.display = 'none');
+    document.getElementById('stake-section').style.display = 'block';
+  }
+
+  function showReferral() {
+    document.querySelectorAll('.container').forEach(container => container.style.display = 'none');
+    document.getElementById('referral-section').style.display = 'block';
+    if (userAccount && referralCode) {
+      document.getElementById('referralLink').value = `https://yourapp.com/ref/${referralCode}`;
+      updateReferral();
+    } else {
+      document.getElementById('referralLink').value = '';
+    }
+  }
+
+  function copyReferralLink() {
+    const referralLink = document.getElementById('referralLink');
+    if (!referralLink.value) {
+      showNotification('Please connect your wallet to get a referral link!', 'error');
+      return;
+    }
+    referralLink.select();
+    document.execCommand('copy');
+    showNotification('Referral link copied to clipboard!', 'success');
+  }
+
+  document.querySelectorAll('.taskbar-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (e.target.textContent === 'Stake') {
+        showStake();
+      } else if (e.target.textContent === 'Referral') {
+        showReferral();
+      } else if (e.target.textContent === 'Momas Network') {
+        showStake();
+      } else if (e.target.textContent === 'Documentation') {
+        showNotification('Documentation page not implemented yet!', 'info');
+      }
+    });
+  });
+
+  document.getElementById('connectButton').addEventListener('click', connectWallet);
+  document.getElementById('approveButton').addEventListener('click', approveAndBuy);
+  
+  let debounceTimeout;
+  document.getElementById('usdtAmount').addEventListener('input', () => {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(calculateMomas, 300);
+  });
+
+  window.addEventListener('load', init);
+</script>
 </body>
 </html>
