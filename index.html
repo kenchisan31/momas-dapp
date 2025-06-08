@@ -170,13 +170,68 @@
   let totalUsdtSpent = 0; // Tổng USDT đã chi
 
   const usdtContractABI = [
-    // (Giữ nguyên ABI như trước)
+    {
+      "constant": true,
+      "inputs": [{"name": "_owner", "type": "address"}],
+      "name": "balanceOf",
+      "outputs": [{"name": "balance", "type": "uint256"}],
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {"name": "_spender", "type": "address"},
+        {"name": "_value", "type": "uint256"}
+      ],
+      "name": "approve",
+      "outputs": [{"name": "success", "type": "bool"}],
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {"name": "_owner", "type": "address"},
+        {"name": "_spender", "type": "address"}
+      ],
+      "name": "allowance",
+      "outputs": [{"name": "remaining", "type": "uint256"}],
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {"name": "_to", "type": "address"},
+        {"name": "_value", "type": "uint256"}
+      ],
+      "name": "transfer",
+      "outputs": [{"name": "success", "type": "bool"}],
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {"name": "_from", "type": "address"},
+        {"name": "_to", "type": "address"},
+        {"name": "_value", "type": "uint256"}
+      ],
+      "name": "transferFrom",
+      "outputs": [{"name": "success", "type": "bool"}],
+      "type": "function"
+    }
   ];
 
   const contractAddress = '0xd3D61008559AcdE3bb6984431E77cA2Fd648aB02';
-  const usdtContractAddress = '0x55d398326f99059fF775485246999027B3197955';
+  const usdtContractAddress = '0x55d398326f99059fF775485246999027B3197955'; // Địa chỉ USDT trên BSC
   const contractABI = [
-    // (Giữ nguyên ABI như trước)
+    {
+      "inputs":[{"internalType":"address","name":"_usdtAddress","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
+      {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},
+      {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},
+      {"inputs":[{"internalType":"uint256","name":"usdtAmount","type":"uint256"}],"name":"buyTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},
+      {"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+      {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+      {"inputs":[],"name":"rate","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+      {"inputs":[],"name":"usdt","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"}
   ];
   let contract;
   let usdtContract;
@@ -360,70 +415,21 @@
     console.log('Momas calculated from USDT spent:', momasFromUsdt);
   }
 
-  async function finalizeConnection() {
-    const button = document.getElementById('connectButton');
-    const shortAddress = `${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`;
-    button.innerText = shortAddress;
-
-    referralCode = generateRandomCode();
-    document.getElementById('referralLink').value = `https://yourapp.com/ref/${referralCode}`;
-
-    await checkNetwork();
-    if (isNetworkValid) {
-      contract = new web3.eth.Contract(contractABI, contractAddress);
-      try {
-        const rawRate = await contract.methods.rate().call();
-        rate = Number(rawRate) / 1e12;
-        if (rate !== 10) {
-          console.warn(`Rate từ hợp đồng (${rate}) không khớp với kỳ vọng (10). Kiểm tra hợp đồng!`);
-        }
-      } catch (error) {
-        console.error('Error fetching rate:', error);
-        showNotification('Failed to fetch rate from contract. Using default rate.', 'error');
-        rate = 10;
-      }
-      await updateBalance();
-      await updateMomasBalance();
-      await updateReferral();
-    }
-
-    if (window.ethereum) {
-      window.ethereum.on('chainChanged', () => {
-        console.log('Chain changed, rechecking network');
-        checkNetwork();
-      });
-      window.ethereum.on('accountsChanged', async (accounts) => {
-        console.log('Accounts changed:', accounts);
-        if (accounts.length > 0) {
-          userAccount = accounts[0];
-          const shortAddress = `${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`;
-          document.getElementById('connectButton').innerText = shortAddress;
-          document.getElementById('momasAmount').innerText = '0.0';
-          await updateBalance();
-          await updateMomasBalance();
-          await updateReferral();
-        } else {
-          userAccount = null;
-          document.getElementById('connectButton').innerText = 'Connect Wallet';
-          document.getElementById('usdtBalance').innerText = '0.0';
-          document.getElementById('momasBalance').innerText = '0.0';
-          document.getElementById('referralLink').value = '';
-          document.getElementById('referralCount').innerText = '0';
-          document.getElementById('momasAmount').innerText = '0.0';
-        }
-      });
-    }
-  }
-
   async function updateBalance() {
-    if (!userAccount || !web3 || !isNetworkValid) return;
+    if (!userAccount || !web3 || !isNetworkValid) {
+      document.getElementById('usdtBalance').innerText = '0.0';
+      console.log('Cannot update USDT balance: no userAccount or invalid network');
+      return;
+    }
     try {
       usdtContract = new web3.eth.Contract(usdtContractABI, usdtContractAddress);
+      console.log('Querying USDT balance for address:', userAccount);
       const balance = await usdtContract.methods.balanceOf(userAccount).call();
+      console.log('Raw USDT balance (Wei):', balance);
       const usdtBalance = Number(web3.utils.fromWei(balance, 'ether'));
+      console.log('Converted USDT balance (Ether):', usdtBalance);
       document.getElementById('usdtBalance').innerText = usdtBalance.toFixed(2);
       document.getElementById('usdtAmount').max = usdtBalance;
-      console.log('Updated USDT balance:', usdtBalance);
     } catch (error) {
       console.error('Error fetching USDT balance:', error);
       document.getElementById('usdtBalance').innerText = '0.0';
@@ -518,8 +524,8 @@
       console.log('Buy transaction hash:', buyTx.transactionHash);
       if (buyTx.status) {
         showNotification('Momas purchased successfully!', 'success');
-        totalUsdtSpent += usdtAmount; // Cộng dồn USDT đã chi
-        localStorage.setItem(`usdtSpent_${userAccount}`, totalUsdtSpent.toString()); // Lưu vào localStorage
+        totalUsdtSpent += usdtAmount;
+        localStorage.setItem(`usdtSpent_${userAccount}`, totalUsdtSpent.toString());
         const momasEarned = totalUsdtSpent * rate;
         document.getElementById('momasBalance').innerText = momasEarned.toFixed(2);
         document.getElementById('usdtAmount').value = '0';
