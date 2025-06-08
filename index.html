@@ -38,7 +38,6 @@
       font-size: 14px;
       color: #ff0000;
     }
-
     .notification-box {
       display: none;
       position: fixed;
@@ -228,6 +227,7 @@
         {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},
         {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},
         {"inputs":[{"internalType":"uint256","name":"usdtAmount","type":"uint256"}],"name":"buyTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},
+        {"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}, // Thêm hàm balanceOf
         {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
         {"inputs":[],"name":"rate","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
         {"inputs":[],"name":"usdt","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"}
@@ -285,55 +285,50 @@
     }
 
     async function checkNetwork() {
-  const chainId = await web3.eth.getChainId();
-  const bscMainnetChainId = 56;
-  isNetworkValid = chainId === bscMainnetChainId;
-  const networkStatus = document.getElementById('networkStatus');
-  const approveButton = document.getElementById('approveButton');
-  approveButton.addEventListener('click', approveAndBuy);
-  approveButton.addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  approveAndBuy();
-});
-  if (isNetworkValid) {
-    networkStatus.innerText = 'Connected to BSC Mainnet';
-    networkStatus.style.color = '#00ff00';
-    approveButton.disabled = false;
-  } else {
-    networkStatus.innerText = 'Please switch to Binance Smart Chain Mainnet to proceed with transactions.';
-    networkStatus.style.color = '#ff0000';
-    approveButton.disabled = true;
-    showNotification('Please switch to Binance Smart Chain Mainnet in MetaMask.', 'error');
-    try {
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: '0x38' }],
-      });
-    } catch (switchError) {
-      if (switchError.code === 4902) {
-        await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [
-            {
-              chainId: '0x38',
-              chainName: 'Binance Smart Chain Mainnet',
-              rpcUrls: ['https://bsc-dataseed1.ninicoin.io/'],
-              nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
-              blockExplorerUrls: ['https://bscscan.com'],
-            },
-          ],
-        });
+      const chainId = await web3.eth.getChainId();
+      const bscMainnetChainId = 56;
+      isNetworkValid = chainId === bscMainnetChainId;
+      const networkStatus = document.getElementById('networkStatus');
+      const approveButton = document.getElementById('approveButton');
+      if (isNetworkValid) {
+        networkStatus.innerText = 'Connected to BSC Mainnet';
+        networkStatus.style.color = '#00ff00';
+        approveButton.disabled = false;
+      } else {
+        networkStatus.innerText = 'Please switch to Binance Smart Chain Mainnet to proceed with transactions.';
+        networkStatus.style.color = '#ff0000';
+        approveButton.disabled = true;
+        showNotification('Please switch to Binance Smart Chain Mainnet in MetaMask.', 'error');
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0x38' }],
+          });
+        } catch (switchError) {
+          if (switchError.code === 4902) {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                {
+                  chainId: '0x38',
+                  chainName: 'Binance Smart Chain Mainnet',
+                  rpcUrls: ['https://bsc-dataseed1.ninicoin.io/'],
+                  nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+                  blockExplorerUrls: ['https://bscscan.com'],
+                },
+              ],
+            });
+          }
+        }
       }
     }
-  }
-}
 
     async function connectWallet() {
       try {
         if (window.ethereum) {
           web3 = new Web3(window.ethereum);
           const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          if (accounts.length === 0) {
+          if (accounts.length === Santos344) {
             throw new Error('No accounts returned. Please allow wallet connection.');
           }
           userAccount = accounts[0];
@@ -351,29 +346,26 @@
       }
     }
 
-   async function connectWithWalletConnect() {
-  closeWalletModal();
-  try {
-    const provider = new WalletConnectProvider.default({
-       projectId: 'b90083c2fef7850b1c00d5e99f12c030',
-      rpc: {
-        56: 'https://bsc-dataseed1.ninicoin.io/',
-        97: 'https://data-seed-prebsc-1-s1.binance.org:8545/',
-      },
-      chainId: 56,
-    });
-    await provider.enable();
-    web3 = new Web3(provider);
-    const accounts = await web3.eth.getAccounts()
-
-
-    userAccount = accounts[0];
-    await finalizeConnection();
-  } catch (error) {
-    console.error('Error connecting WalletConnect:', error);
-    showNotification(error.message || 'Failed to connect WalletConnect.', 'error');
-  }
-}
+    async function connectWithWalletConnect() {
+      try {
+        closeWalletModal();
+        const provider = new WalletConnectProvider.default({
+          rpc: {
+            56: 'https://bsc-dataseed1.ninicoin.io/',
+            97: 'https://data-seed-prebsc-1-s1.ninicoin.org:8545/',
+          },
+          chainId: 56,
+        });
+        await provider.enable();
+        web3 = new Web3(provider);
+        const accounts = await web3.eth.getAccounts();
+        userAccount = accounts[0];
+        await finalizeConnection();
+      } catch (error) {
+        console.error('Error connecting WalletConnect:', error);
+        showNotification(error.message || 'Failed to connect WalletConnect.', 'error');
+      }
+    }
 
     async function updateMomasBalance() {
       if (!userAccount || !web3 || !isNetworkValid) {
@@ -382,25 +374,16 @@
       }
       try {
         contract = new web3.eth.Contract(contractABI, contractAddress);
-        const events = await contract.getPastEvents('Transfer', {
-          filter: { to: userAccount, from: '0x0000000000000000000000000000000000000000' }, // Mint events
-          fromBlock: 0,
-          toBlock: 'latest'
-        });
-
-        let totalMomas = 0;
-        for (const event of events) {
-          const amount = Number(web3.utils.fromWei(event.returnValues.value, 'ether')); // Momas có 18 decimals
-          totalMomas += amount;
-        }
-
-        document.getElementById('momasBalance').innerText = totalMomas.toFixed(2);
-        localStorage.setItem(`momasBalance_${userAccount}`, totalMomas.toString()); // Lưu vào localStorage để dự phòng
+        const balance = await contract.methods.balanceOf(userAccount).call();
+        const momasBalance = Number(web3.utils.fromWei(balance, 'ether')); // Momas có 18 decimals
+        document.getElementById('momasBalance').innerText = momasBalance.toFixed(2);
+        localStorage.setItem(`momasBalance_${userAccount}`, momasBalance.toString()); // Lưu vào localStorage
+        console.log('Updated Momas balance:', momasBalance);
       } catch (error) {
-        console.error('Error fetching Momas balance from events:', error);
+        console.error('Error fetching Momas balance:', error);
         const storedBalance = localStorage.getItem(`momasBalance_${userAccount}`) || '0';
         document.getElementById('momasBalance').innerText = parseFloat(storedBalance).toFixed(2);
-        showNotification('Failed to fetch Momas balance from blockchain. Using local data.', 'error');
+        showNotification('Failed to fetch Momas balance. Using local data.', 'error');
       }
     }
 
@@ -417,12 +400,12 @@
         contract = new web3.eth.Contract(contractABI, contractAddress);
         try {
           const rawRate = await contract.methods.rate().call();
-          rate = Number(rawRate) / 1e12; // Điều chỉnh rate từ hợp đồng: 10 * 1e12 -> 10
+          rate = Number(rawRate) / 1e12; // Điều chỉnh rate từ hợp đồng
           if (rate !== 10) {
             console.warn(`Rate từ hợp đồng (${rate}) không khớp với kỳ vọng (10). Kiểm tra hợp đồng!`);
           }
         } catch (error) {
-          console.error('Error fetching rate from contract:', error);
+          console.error('Error fetching rate:', error);
           showNotification('Failed to fetch rate from contract. Using default rate.', 'error');
           rate = 10;
         }
@@ -476,7 +459,7 @@
       if (!userAccount || !web3 || !isNetworkValid) return;
       try {
         contract = new web3.eth.Contract(contractABI, contractAddress);
-        const count = 0;
+        const count = 0; // Thay bằng logic thật nếu có hàm referral
         document.getElementById('referralCount').innerText = count || '0';
       } catch (error) {
         console.error('Error fetching referral count:', error);
@@ -493,86 +476,92 @@
 
     function setMax() {
       const input = document.getElementById('usdtAmount');
-      input.value = input.max || 100;
+      input.value = input.max || '100';
       calculateMomas();
     }
 
-   async function approveAndBuy() {
-  if (!isNetworkValid) {
-    showNotification('Please switch to Binance Smart Chain Mainnet.', 'error');
-    return;
-  }
-  const button = document.getElementById('approveButton');
-  const usdtAmount = parseFloat(document.getElementById('usdtAmount').value) || 0;
-  if (usdtAmount <= 0) {
-    showNotification('Please enter a valid USDT amount!', 'error');
-    return;
-  }
-  if (!userAccount || !web3) {
-    showNotification('Please connect your wallet!', 'error');
-    return;
-  }
-  try {
-    button.disabled = true;
-    button.innerText = 'Approving USDT...';
-    usdtContract = new web3.eth.Contract(usdtContractABI, usdtContractAddress);
-    const balance = await usdtContract.methods.balanceOf(userAccount).call();
-    const amountInWei = web3.utils.toWei(usdtAmount.toString(), 'ether');
-    if (BigInt(balance) < BigInt(amountInWei)) {
-      throw new Error('Insufficient USDT balance! Please add more USDT.');
+    async function approveAndBuy() {
+      if (!isNetworkValid) {
+        showNotification('Please switch to Binance Smart Chain Mainnet.', 'error');
+        return;
+      }
+      const button = document.getElementById('approveButton');
+      const usdtAmount = parseFloat(document.getElementById('usdtAmount').value) || 0;
+      if (usdtAmount <= 0) {
+        showNotification('Please enter a valid USDT amount!', 'error');
+        return;
+      }
+      if (!userAccount || !web3) {
+        showNotification('Please connect your wallet!', 'error');
+        return;
+      }
+      try {
+        button.disabled = true;
+        button.innerText = 'Approving USDT...';
+        usdtContract = new web3.eth.Contract(usdtContractABI, usdtContractAddress);
+        const balance = await usdtContract.methods.balanceOf(userAccount).call();
+        const amountInWei = web3.utils.toWei(usdtAmount.toString(), 'ether');
+        if (BigInt(balance) < BigInt(amountInWei)) {
+          throw new Error('Insufficient USDT balance! Please add more USDT.');
+        }
+        let gasApprove;
+        try {
+          gasApprove = await usdtContract.methods.approve(contractAddress, amountInWei).estimateGas({ from: userAccount });
+          gasApprove = Math.round(gasApprove * 1.2);
+        } catch (error) {
+          console.error('Gas estimation failed for approve:', error);
+          gasApprove = 100000;
+        }
+        const approveTx = await usdtContract.methods.approve(contractAddress, amountInWei).send({
+          from: userAccount,
+          gas: gasApprove,
+        });
+        if (approveTx.status) {
+          showNotification('USDT approved successfully!', 'success', 2000);
+        } else {
+          throw new Error('Approval transaction failed.');
+        }
+        button.innerText = 'Buying Momas...';
+        const allowance = await usdtContract.methods.allowance(userAccount, contractAddress).call();
+        if (BigInt(allowance) < BigInt(amountInWei)) {
+          throw new Error('Insufficient USDT allowance.');
+        }
+        contract = new web3.eth.Contract(contractABI, contractAddress);
+        let gasBuy;
+        try {
+          gasBuy = await contract.methods.buyTokens(amountInWei).estimateGas({ from: userAccount });
+          gasBuy = Math.round(gasBuy * 1.2);
+        } catch (error) {
+          console.error('Gas estimation failed for buy:', error);
+          gasBuy = 200000;
+        }
+        const buyTx = await contract.methods.buyTokens(amountInWei).send({
+          from: userAccount,
+          gas: gasBuy,
+        });
+        if (buyTx.status) {
+          showNotification('Momas purchased successfully!', 'success');
+          document.getElementById('usdtAmount').value = '0';
+          document.getElementById('momasAmount').innerText = '0.0';
+          await updateMomasBalance(); // Cập nhật số dư ngay sau khi mua
+          await updateBalance(); // Cập nhật số dư USDT
+        } else {
+          throw new Error('Buy transaction failed.');
+        }
+      } catch (error) {
+        console.error('Transaction error:', error);
+        let errorMessage = error.message || 'Transaction failed. Please try again.';
+        if (error.code === 4001) {
+          errorMessage = 'You rejected the transaction in MetaMask.';
+        } else if (error.message.includes('revert')) {
+          errorMessage = 'Transaction reverted. Please check contract or parameters.';
+        }
+        showNotification(errorMessage, 'error');
+      } finally {
+        button.disabled = false;
+        button.innerText = 'Approve and Buy Momas';
+      }
     }
-    let gasApprove;
-    try {
-      gasApprove = await usdtContract.methods.approve(contractAddress, amountInWei).estimateGas({ from: userAccount });
-      gasApprove = Math.round(gasApprove * 1.2);
-    } catch (error) {
-      console.error('Gas estimation failed for approve:', error);
-      gasApprove = 100000;
-    }
-    const transaction = await usdtContract.methods.approve(contractAddress, amountInWei).send({
-      from: userAccount,
-      gas: gasApprove,
-    });
-    if (transaction.status) {
-      showNotification('USDT approved successfully!', 'success', 2000);
-    } else {
-      throw new Error('Approval transaction failed.');
-    }
-    button.innerText = 'Buying Momas...';
-    const allowance = await usdtContract.methods.allowance(userAccount, contractAddress).call();
-    if (BigInt(allowance) < BigInt(amountInWei)) {
-      throw new Error('Insufficient USDT allowance.');
-    }
-    contract = new web3.eth.Contract(contractABI, contractAddress);
-    let gasBuy;
-    try {
-      gasBuy = await contract.methods.buyTokens(amountInWei).estimateGas({ from: userAccount });
-      gasBuy = Math.round(gasBuy * 1.2);
-    } catch (error) {
-      console.error('Gas estimation failed for buy:', error);
-      gasBuy = 200000;
-    }
-    await contract.methods.buyTokens(amountInWei).send({
-      from: userAccount,
-      gas: gasBuy,
-    });
-    showNotification('Momas purchased successfully!', 'success');
-    document.getElementById('momasAmount').innerText = '0.0';
-    await updateMomasBalance();
-  } catch (error) {
-    console.error('Transaction error:', error);
-    let errorMessage = error.message || 'Transaction failed. Please try again.';
-    if (error.code === 4001) {
-      errorMessage = 'You rejected the transaction in MetaMask.';
-    } else if (error.message.includes('revert')) {
-      errorMessage = 'Transaction reverted. Please check contract or parameters.';
-    }
-    showNotification(errorMessage, 'error');
-  } finally {
-    button.disabled = false;
-    button.innerText = 'Approve and Buy Momas';
-  }
-}
 
     function showStake() {
       document.querySelectorAll('.container').forEach(container => container.style.display = 'none');
