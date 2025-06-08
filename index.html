@@ -158,17 +158,33 @@
       <span id="referralCount">0</span>
     </div>
   </div>
-
+  
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <script src="/assets/walletconnect.min.js"></script>
   
- <script>
+<script>
+  // Khởi tạo Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyBRyrsNZXFbvIX9E-x1TJuIPe4e9T2WXOw",
+    authDomain: "momas-b1750.firebaseapp.com",
+    databaseURL: "https://momas-b1750-default-rtdb.firebaseio.com",
+    projectId: "momas-b1750",
+    storageBucket: "momas-b1750.firebasestorage.app",
+    messagingSenderId: "754099975381",
+    appId: "1:754099975381:web:d850a1c27592f956269e5c",
+    measurementId: "G-EE8Z9N0V8G"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+
   let userAccount;
   let rate = 10;
   let web3;
   let referralCode = '';
   let isNetworkValid = false;
-  let totalUsdtSpent = 0; // Tổng USDT đã chi, khởi tạo từ localStorage nếu có
+  let totalUsdtSpent = 0;
 
   const usdtContractABI = [
     {
@@ -240,21 +256,16 @@
     const notificationBox = document.getElementById('notificationBox');
     const notificationMessage = document.getElementById('notificationMessage');
     const notificationOverlay = document.getElementById('notificationOverlay');
-
     notificationMessage.innerText = message;
     notificationBox.className = `notification-box ${type}`;
     notificationBox.style.display = 'block';
     notificationOverlay.style.display = 'block';
-
-    if (autoClose) {
-      setTimeout(closeNotification, autoClose);
-    }
+    if (autoClose) setTimeout(closeNotification, autoClose);
   }
 
   function closeNotification() {
     const notificationBox = document.getElementById('notificationBox');
     const notificationOverlay = document.getElementById('notificationOverlay');
-
     notificationBox.style.display = 'none';
     notificationOverlay.style.display = 'none';
   }
@@ -262,35 +273,27 @@
   function generateRandomCode(length = 8) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let code = '';
-    for (let i = 0; i < length; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
+    for (let i = 0; i < length; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
     return code;
   }
 
-  function showWalletModal() {
-    document.getElementById('walletModal').style.display = 'flex';
-  }
-
-  function closeWalletModal() {
-    document.getElementById('walletModal').style.display = 'none';
-  }
+  function showWalletModal() { document.getElementById('walletModal').style.display = 'flex'; }
+  function closeWalletModal() { document.getElementById('walletModal').style.display = 'none'; }
 
   async function init() {
     console.log('Page loaded, waiting for wallet connection');
-    if (window.ethereum) {
-      await connectWallet();
-    } else {
-      showWalletModal();
-    }
-    // Load tổng USDT đã chi từ localStorage khi khởi động
+    if (window.ethereum) await connectWallet();
+    else showWalletModal();
     const storedUsdtSpent = localStorage.getItem(`usdtSpent_${userAccount}`);
     if (storedUsdtSpent) {
       totalUsdtSpent = parseFloat(storedUsdtSpent);
       const momasEarned = totalUsdtSpent * rate;
       document.getElementById('momasBalance').innerText = momasEarned.toFixed(2);
-      console.log('Loaded USDT spent:', totalUsdtSpent, 'Momas earned:', momasEarned);
     }
+    // Kiểm tra tham số Referral trong URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref');
+    if (refCode && userAccount) handleReferralLink(refCode);
   }
 
   async function checkNetwork() {
@@ -300,10 +303,7 @@
     const networkStatus = document.getElementById('networkStatus');
     const approveButton = document.getElementById('approveButton');
     approveButton.addEventListener('click', approveAndBuy);
-    approveButton.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      approveAndBuy();
-    });
+    approveButton.addEventListener('touchstart', (e) => { e.preventDefault(); approveAndBuy(); });
     if (isNetworkValid) {
       networkStatus.innerText = 'Connected to BSC Mainnet';
       networkStatus.style.color = '#00ff00';
@@ -314,25 +314,12 @@
       approveButton.disabled = true;
       showNotification('Please switch to Binance Smart Chain Mainnet in MetaMask.', 'error');
       try {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0x38' }],
-        });
+        await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] });
       } catch (switchError) {
-        if (switchError.code === 4902) {
-          await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [
-              {
-                chainId: '0x38',
-                chainName: 'Binance Smart Chain Mainnet',
-                rpcUrls: ['https://bsc-dataseed1.ninicoin.io/'],
-                nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
-                blockExplorerUrls: ['https://bscscan.com'],
-              },
-            ],
-          });
-        }
+        if (switchError.code === 4902) await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{ chainId: '0x38', chainName: 'Binance Smart Chain Mainnet', rpcUrls: ['https://bsc-dataseed1.ninicoin.io/'], nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 }, blockExplorerUrls: ['https://bscscan.com'] }],
+        });
       }
     }
   }
@@ -342,21 +329,14 @@
       if (window.ethereum) {
         web3 = new Web3(window.ethereum);
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        if (accounts.length === 0) {
-          throw new Error('No accounts returned. Please allow wallet connection.');
-        }
+        if (accounts.length === 0) throw new Error('No accounts returned. Please allow wallet connection.');
         userAccount = accounts[0];
         await finalizeConnection();
-      } else {
-        throw new Error('No wallet detected. Please use WalletConnect.');
-      }
+      } else throw new Error('No wallet detected. Please use WalletConnect.');
     } catch (error) {
       console.error('Error connecting wallet:', error);
-      if (error.message.includes('No wallet detected')) {
-        showWalletModal();
-      } else {
-        showNotification(error.message || 'Failed to connect wallet.', 'error');
-      }
+      if (error.message.includes('No wallet detected')) showWalletModal();
+      else showNotification(error.message || 'Failed to connect wallet.', 'error');
     }
   }
 
@@ -365,10 +345,7 @@
     try {
       const provider = new WalletConnectProvider.default({
         projectId: 'b90083c2fef7850b1c00d5e99f12c030',
-        rpc: {
-          56: 'https://bsc-dataseed1.ninicoin.io/',
-          97: 'https://data-seed-prebsc-1-s1.binance.org:8545/',
-        },
+        rpc: { 56: 'https://bsc-dataseed1.ninicoin.io/', 97: 'https://data-seed-prebsc-1-s1.binance.org:8545/' },
         chainId: 56,
       });
       await provider.enable();
@@ -387,10 +364,9 @@
       document.getElementById('momasBalance').innerText = '0.0';
       return;
     }
-    // Không cần lấy từ blockchain nữa, dùng totalUsdtSpent
     const momasEarned = totalUsdtSpent * rate;
     document.getElementById('momasBalance').innerText = momasEarned.toFixed(2);
-    localStorage.setItem(`momasBalance_${userAccount}`, momasEarned.toString()); // Lưu để đồng bộ
+    localStorage.setItem(`momasBalance_${userAccount}`, momasEarned.toString());
     console.log('Updated Momas balance from USDT spent:', momasEarned);
   }
 
@@ -399,18 +375,23 @@
     const shortAddress = `${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`;
     button.innerText = shortAddress;
 
+    // Lưu mã Referral và ví vào Firebase
     referralCode = generateRandomCode();
-    document.getElementById('referralLink').value = `https://yourapp.com/ref/${referralCode}`;
+    const referralsRef = database.ref('referrals/' + referralCode);
+    referralsRef.once('value').then((snapshot) => {
+      if (!snapshot.exists()) {
+        referralsRef.set({ owner: userAccount, referred: [], count: 0 });
+      }
+    });
+    document.getElementById('referralLink').value = `https://momas-dapp-tpko.vercel.app/?ref=${referralCode}`;
 
     await checkNetwork();
     if (isNetworkValid) {
       contract = new web3.eth.Contract(contractABI, contractAddress);
       try {
         const rawRate = await contract.methods.rate().call();
-        rate = Number(rawRate) / 1e12; // Điều chỉnh rate từ hợp đồng: 10 * 1e12 -> 10
-        if (rate !== 10) {
-          console.warn(`Rate từ hợp đồng (${rate}) không khớp với kỳ vọng (10). Kiểm tra hợp đồng!`);
-        }
+        rate = Number(rawRate) / 1e12;
+        if (rate !== 10) console.warn(`Rate từ hợp đồng (${rate}) không khớp với kỳ vọng (10). Kiểm tra hợp đồng!`);
       } catch (error) {
         console.error('Error fetching rate from contract:', error);
         showNotification('Failed to fetch rate from contract. Using default rate.', 'error');
@@ -422,9 +403,7 @@
     }
 
     if (window.ethereum) {
-      window.ethereum.on('chainChanged', () => {
-        checkNetwork();
-      });
+      window.ethereum.on('chainChanged', () => checkNetwork());
       window.ethereum.on('accountsChanged', async (accounts) => {
         if (accounts.length > 0) {
           userAccount = accounts[0];
@@ -464,15 +443,17 @@
 
   async function updateReferral() {
     if (!userAccount || !web3 || !isNetworkValid) return;
-    try {
-      contract = new web3.eth.Contract(contractABI, contractAddress);
-      const count = 0;
-      document.getElementById('referralCount').innerText = count || '0';
-    } catch (error) {
-      console.error('Error fetching referral count:', error);
+    const referralRef = database.ref('referrals/' + referralCode);
+    referralRef.once('value').then((snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        document.getElementById('referralCount').innerText = data.count || '0';
+      }
+    }).catch((error) => {
+      console.error('Error fetching referral data:', error);
       document.getElementById('referralCount').innerText = '0';
-      showNotification('Failed to fetch referral count: ' + error.message, 'error');
-    }
+      showNotification('Failed to fetch referral data: ' + error.message, 'error');
+    });
   }
 
   function calculateMomas() {
@@ -508,9 +489,7 @@
       usdtContract = new web3.eth.Contract(usdtContractABI, usdtContractAddress);
       const balance = await usdtContract.methods.balanceOf(userAccount).call();
       const amountInWei = web3.utils.toWei(usdtAmount.toString(), 'ether');
-      if (BigInt(balance) < BigInt(amountInWei)) {
-        throw new Error('Insufficient USDT balance! Please add more USDT.');
-      }
+      if (BigInt(balance) < BigInt(amountInWei)) throw new Error('Insufficient USDT balance! Please add more USDT.');
       let gasApprove;
       try {
         gasApprove = await usdtContract.methods.approve(contractAddress, amountInWei).estimateGas({ from: userAccount });
@@ -519,20 +498,12 @@
         console.error('Gas estimation failed for approve:', error);
         gasApprove = 100000;
       }
-      const transaction = await usdtContract.methods.approve(contractAddress, amountInWei).send({
-        from: userAccount,
-        gas: gasApprove,
-      });
-      if (transaction.status) {
-        showNotification('USDT approved successfully!', 'success', 2000);
-      } else {
-        throw new Error('Approval transaction failed.');
-      }
+      const transaction = await usdtContract.methods.approve(contractAddress, amountInWei).send({ from: userAccount, gas: gasApprove });
+      if (transaction.status) showNotification('USDT approved successfully!', 'success', 2000);
+      else throw new Error('Approval transaction failed.');
       button.innerText = 'Buying Momas...';
       const allowance = await usdtContract.methods.allowance(userAccount, contractAddress).call();
-      if (BigInt(allowance) < BigInt(amountInWei)) {
-        throw new Error('Insufficient USDT allowance.');
-      }
+      if (BigInt(allowance) < BigInt(amountInWei)) throw new Error('Insufficient USDT allowance.');
       contract = new web3.eth.Contract(contractABI, contractAddress);
       let gasBuy;
       try {
@@ -542,12 +513,8 @@
         console.error('Gas estimation failed for buy:', error);
         gasBuy = 200000;
       }
-      await contract.methods.buyTokens(amountInWei).send({
-        from: userAccount,
-        gas: gasBuy,
-      });
+      await contract.methods.buyTokens(amountInWei).send({ from: userAccount, gas: gasBuy });
       showNotification('Momas purchased successfully!', 'success');
-      // Cập nhật tổng USDT đã chi và Momas
       totalUsdtSpent += usdtAmount;
       localStorage.setItem(`usdtSpent_${userAccount}`, totalUsdtSpent.toString());
       await updateMomasBalance();
@@ -555,11 +522,8 @@
     } catch (error) {
       console.error('Transaction error:', error);
       let errorMessage = error.message || 'Transaction failed. Please try again.';
-      if (error.code === 4001) {
-        errorMessage = 'You rejected the transaction in MetaMask.';
-      } else if (error.message.includes('revert')) {
-        errorMessage = 'Transaction reverted. Please check contract or parameters.';
-      }
+      if (error.code === 4001) errorMessage = 'You rejected the transaction in MetaMask.';
+      else if (error.message.includes('revert')) errorMessage = 'Transaction reverted. Please check contract or parameters.';
       showNotification(errorMessage, 'error');
     } finally {
       button.disabled = false;
@@ -576,11 +540,9 @@
     document.querySelectorAll('.container').forEach(container => container.style.display = 'none');
     document.getElementById('referral-section').style.display = 'block';
     if (userAccount && referralCode) {
-      document.getElementById('referralLink').value = `https://yourapp.com/ref/${referralCode}`;
+      document.getElementById('referralLink').value = `https://momas-dapp-tpko.vercel.app/?ref=${referralCode}`;
       updateReferral();
-    } else {
-      document.getElementById('referralLink').value = '';
-    }
+    } else document.getElementById('referralLink').value = '';
   }
 
   function copyReferralLink() {
@@ -594,18 +556,30 @@
     showNotification('Referral link copied to clipboard!', 'success');
   }
 
+  function handleReferralLink(refCode) {
+    if (userAccount && refCode !== referralCode) {
+      const referralRef = database.ref('referrals/' + refCode);
+      referralRef.once('value').then((snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          if (!data.referred.includes(userAccount)) {
+            data.referred.push(userAccount);
+            data.count += 1;
+            referralRef.set(data);
+            showNotification('You have joined via a referral link!', 'success');
+          }
+        } else showNotification('Invalid referral code.', 'error');
+      });
+    }
+  }
+
   document.querySelectorAll('.taskbar-item').forEach(item => {
     item.addEventListener('click', (e) => {
       e.preventDefault();
-      if (e.target.textContent === 'Stake') {
-        showStake();
-      } else if (e.target.textContent === 'Referral') {
-        showReferral();
-      } else if (e.target.textContent === 'Momas Network') {
-        showStake();
-      } else if (e.target.textContent === 'Documentation') {
-        showNotification('Documentation page not implemented yet!', 'info');
-      }
+      if (e.target.textContent === 'Stake') showStake();
+      else if (e.target.textContent === 'Referral') showReferral();
+      else if (e.target.textContent === 'Momas Network') showStake();
+      else if (e.target.textContent === 'Documentation') showNotification('Documentation page not implemented yet!', 'info');
     });
   });
 
