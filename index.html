@@ -124,7 +124,7 @@
   <div class="container" id="stake-section">
     <h1>Stake Momas</h1>
     <div class="result">
-      <label>Số Momas bạn đang sở hữu</label>
+      <label>USDT You spend</label>
       <span id="momasBalance">0.0</span>
     </div>
     <div class="result">
@@ -221,7 +221,7 @@
   ];
 
   const contractAddress = '0xd3D61008559AcdE3bb6984431E77cA2Fd648aB02';
-  const usdtContractAddress = '0x55d398326f99059fF775485246999027B3197955'; // Địa chỉ USDT trên BSC
+  const usdtContractAddress = '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d'; // USDT BEP20 chính thức trên BSC
   const contractABI = [
     {
       "inputs":[{"internalType":"address","name":"_usdtAddress","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
@@ -284,7 +284,6 @@
       console.log('No MetaMask detected, showing wallet modal');
       showWalletModal();
     }
-    // Load tổng USDT đã chi từ localStorage khi khởi động
     const storedUsdtSpent = localStorage.getItem(`usdtSpent_${userAccount}`);
     if (storedUsdtSpent) {
       totalUsdtSpent = parseFloat(storedUsdtSpent);
@@ -390,6 +389,61 @@
     }
   }
 
+  async function finalizeConnection() {
+    const button = document.getElementById('connectButton');
+    const shortAddress = `${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`;
+    button.innerText = shortAddress;
+
+    referralCode = generateRandomCode();
+    document.getElementById('referralLink').value = `https://yourapp.com/ref/${referralCode}`;
+
+    await checkNetwork();
+    if (isNetworkValid) {
+      contract = new web3.eth.Contract(contractABI, contractAddress);
+      try {
+        const rawRate = await contract.methods.rate().call();
+        rate = Number(rawRate) / 1e12;
+        if (rate !== 10) {
+          console.warn(`Rate từ hợp đồng (${rate}) không khớp với kỳ vọng (10). Kiểm tra hợp đồng!`);
+        }
+      } catch (error) {
+        console.error('Error fetching rate:', error);
+        showNotification('Failed to fetch rate from contract. Using default rate.', 'error');
+        rate = 10;
+      }
+      await updateBalance();
+      await updateMomasBalance();
+      await updateReferral();
+    }
+
+    if (window.ethereum) {
+      window.ethereum.on('chainChanged', () => {
+        console.log('Chain changed, rechecking network');
+        checkNetwork();
+      });
+      window.ethereum.on('accountsChanged', async (accounts) => {
+        console.log('Accounts changed:', accounts);
+        if (accounts.length > 0) {
+          userAccount = accounts[0];
+          const shortAddress = `${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`;
+          document.getElementById('connectButton').innerText = shortAddress;
+          document.getElementById('momasAmount').innerText = '0.0';
+          await updateBalance();
+          await updateMomasBalance();
+          await updateReferral();
+        } else {
+          userAccount = null;
+          document.getElementById('connectButton').innerText = 'Connect Wallet';
+          document.getElementById('usdtBalance').innerText = '0.0';
+          document.getElementById('momasBalance').innerText = '0.0';
+          document.getElementById('referralLink').value = '';
+          document.getElementById('referralCount').innerText = '0';
+          document.getElementById('momasAmount').innerText = '0.0';
+        }
+      });
+    }
+  }
+
   async function updateMomasBalance() {
     if (!userAccount || !web3 || !isNetworkValid) {
       document.getElementById('momasBalance').innerText = '0.0';
@@ -409,7 +463,6 @@
       document.getElementById('momasBalance').innerText = parseFloat(storedMomas).toFixed(2);
       showNotification('Failed to fetch Momas balance. Using local data.', 'error');
     }
-    // Hiển thị Momas dựa trên USDT đã chi
     const momasFromUsdt = totalUsdtSpent * rate;
     document.getElementById('momasBalance').innerText = momasFromUsdt.toFixed(2);
     console.log('Momas calculated from USDT spent:', momasFromUsdt);
