@@ -21,7 +21,7 @@ main {
   flex-direction: column; /* Thêm thuộc tính này để xếp chồng các phần tử con */
   max-width: 500px; /* Giới hạn chiều rộng trên màn hình lớn */
   margin: 0 auto; /* Căn giữa toàn bộ khối main */
-  padding-top: 100px; /* Thêm khoảng đệm phía trên để tránh thanh taskbar */
+  padding-top: 10px; /* Thêm khoảng đệm phía trên để tránh thanh taskbar */
   gap: 20px; /* Thêm khoảng cách giữa các khối nội dung */
 }
 
@@ -31,6 +31,7 @@ main {
   border-radius: 10px;
   width: 400px;
   text-align: center;
+  margin-top: 80px; /* Điều chỉnh lại margin-top để tạo khoảng cách với taskbar */
 }
 
 h1 {
