@@ -1,14 +1,14 @@
 /* styles.css */
 body {
-  background: linear-gradient(135deg, #1a0933 0%, #2e1a47 100%);
-  color: white;
-  font-family: Arial, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-}
+      background: linear-gradient(135deg, #1a0933 0%, #2e1a47 100%);
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
 
 .container {
   background: rgba(0, 0, 0, 0.8);
@@ -230,4 +230,5 @@ h1 {
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
   z-index: 1500;
+
 }
