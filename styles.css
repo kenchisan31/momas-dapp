@@ -19,7 +19,9 @@ main {
   justify-content: center;
   align-items: center;
   flex-direction: column; /* Thêm thuộc tính này để xếp chồng các phần tử con */
-  width: 100%; /* Đảm bảo main chiếm hết chiều rộng để có thể căn giữa */
+  max-width: 500px; /* Giới hạn chiều rộng trên màn hình lớn */
+  margin: 0 auto; /* Căn giữa toàn bộ khối main */
+  padding-top: 100px; /* Thêm khoảng đệm phía trên để tránh thanh taskbar */
   gap: 20px; /* Thêm khoảng cách giữa các khối nội dung */
 }
 
@@ -29,7 +31,6 @@ main {
   border-radius: 10px;
   width: 400px;
   text-align: center;
-  margin-top: 60px;
 }
 
 h1 {
