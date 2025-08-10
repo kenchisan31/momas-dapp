@@ -6,120 +6,7 @@
   <title>Momas</title>
    <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="styles.css" />
-  <style>
- 
-    .footer {
-      background-color: #1a1a2b; 
-      color: #999;
-      padding: 24px;
-      text-align: center;
-      box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
-      margin-top: auto; 
-    }
-
-    .footer-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-    }
-
-    .sponsor-logos {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 1.5rem; 
-    }
-
-    .sponsor-logo {
-      height: 40px;
-      object-fit: contain;
-      border-radius: 8px;
-    }
-    .wallet-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    .wallet-modal-content {
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      text-align: center;
-    }
-    .wallet-option {
-      margin: 10px;
-      padding: 10px 20px;
-      background: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .network-status {
-      margin-top: 10px;
-      font-size: 14px;
-      color: #ff0000;
-    }
-
-    .notification-box {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-      z-index: 2000;
-      max-width: 90%;
-      width: 300px;
-      text-align: center;
-    }
-    .notification-box.success {
-      background: #e0ffe0;
-      border: 1px solid #00ff00;
-    }
-    .notification-box.error {
-      background: #ffe0e0;
-      border: 1px solid #ff0000;
-    }
-    .notification-box p {
-      margin: 0 0 15px;
-      font-size: 16px;
-      color: #333;
-    }
-    .notification-box button {
-      padding: 8px 16px;
-      background: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .notification-box button:hover {
-      background: #0056b3;
-    }
-    .notification-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 1500;
-    }
-  </style>
+  
 </head>
 <body>
   <div class="taskbar">
@@ -127,8 +14,7 @@
       <div class="taskbar-left">
         <a href="#" class="taskbar-item">Momas Network</a>
         <a href="#" class="taskbar-item highlight">Stake</a>
-        <a href="#" class="taskbar-item">Documentation</a>
-        <a href="#" class="taskbar-item">Referral</a>
+        
       </div>
       <div class="taskbar-right">
         <button id="connectButton" class="connect-wallet-btn">Connect Wallet</button>
@@ -670,5 +556,6 @@
   </script>
 </body>
 </html>
+
 
 
