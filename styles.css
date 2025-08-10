@@ -1,14 +1,24 @@
 /* styles.css */
 body {
-      background: linear-gradient(135deg, #1a0933 0%, #2e1a47 100%);
-      color: white;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      margin: 0;
-      padding: 0;
-    }
+  background: linear-gradient(135deg, #1a0933 0%, #2e1a47 100%);
+  color: white;
+  font-family: Arial, sans-serif;
+  /* Dùng flex-direction: column để xếp chồng nội dung theo chiều dọc */
+  display: flex;
+  flex-direction: column;
+  /* Đảm bảo chiều cao tối thiểu là 100% viewport để footer luôn ở cuối */
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* Thêm style cho thẻ main để căn giữa nội dung chính */
+main {
+  flex: 1; /* Giúp main chiếm hết không gian còn lại và đẩy footer xuống cuối */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 .container {
   background: rgba(0, 0, 0, 0.8);
@@ -230,5 +240,34 @@ h1 {
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
   z-index: 1500;
+}
 
+/* Thêm các style cho footer vào đây */
+.footer {
+  background-color: #1a1a2b; 
+  color: #999;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: auto; 
+}
+
+.footer-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.sponsor-logos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem; 
+}
+
+.sponsor-logo {
+  height: 40px;
+  object-fit: contain;
+  border-radius: 8px;
 }
