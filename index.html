@@ -4,51 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Momas</title>
-  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="styles.css" />
   <style>
-    body {
-      background-color: #12121e; /* Màu nền tối tương tự trong ảnh */
-      color: #ccc;
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-    
-    
-
-    /* Styles for the footer section */
-    .footer {
-      background-color: #1a1a2b; /* Màu nền tối hơn cho footer */
-      color: #999;
-      padding: 24px;
-      text-align: center;
-      box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
-      margin-top: auto; /* Đẩy footer xuống cuối trang */
-    }
-
-    .footer-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-    }
-
-    .sponsor-logos {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 1.5rem; /* Khoảng cách giữa các logo */
-    }
-
-    .sponsor-logo {
-      height: 40px;
-      object-fit: contain;
-      border-radius: 8px;
-    }
     .wallet-modal {
       display: none;
       position: fixed;
@@ -202,35 +159,6 @@
     </div>
   </div>
 
-  
-  <!-- Bắt đầu phần footer -->
-  <footer class="footer">
-    <div class="container mx-auto">
-      <p class="footer-title">Các nhà tài trợ chính</p>
-      <div class="sponsor-logos">
-        <!-- Logo của Binance -->
-        <img 
-          src="https://placehold.co/120x40/f0b90b/000000?text=Binance" 
-          alt="Logo Binance" 
-          class="sponsor-logo"
-        />
-        <!-- Logo của a16z -->
-        <img 
-          src="https://placehold.co/120x40/000/fff?text=a16z" 
-          alt="Logo a16z" 
-          class="sponsor-logo"
-        />
-        <!-- Logo của đối tác khác -->
-        <img 
-          src="https://placehold.co/120x40/5c5cff/ffffff?text=Partner+1" 
-          alt="Logo đối tác khác" 
-          class="sponsor-logo"
-        />
-      </div>
-      <p class="mt-6 text-sm">© 2025 Momas Dapp. All Rights Reserved.</p>
-    </div>
-  </footer>
-  
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <script src="/assets/walletconnect.min.js"></script>
   
@@ -700,11 +628,4 @@
     window.addEventListener('load', init);
   </script>
 </body>
-
 </html>
-
-
-
-
-
-
