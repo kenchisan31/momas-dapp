@@ -19,6 +19,8 @@ main {
   justify-content: center;
   align-items: center;
   flex-direction: column; /* Thêm thuộc tính này để xếp chồng các phần tử con */
+  width: 100%; /* Đảm bảo main chiếm hết chiều rộng để có thể căn giữa */
+  gap: 20px; /* Thêm khoảng cách giữa các khối nội dung */
 }
 
 .container {
