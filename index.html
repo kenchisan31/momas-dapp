@@ -7,17 +7,7 @@
    <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="styles.css" />
   <style>
-    body {
-      background-color: #12121e; /* Màu nền tối */
-      color: #ccc;
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-    
+ 
     .footer {
       background-color: #1a1a2b; 
       color: #999;
@@ -164,10 +154,7 @@
 
   <div class="container" id="stake-section">
     <h1>Stake Momas</h1>
-    <div class="result">
-      <label>Số Momas bạn đang sở hữu</label>
-      <span id="momasBalance">0.0</span>
-    </div>
+    
     <div class="result">
       <label>USDT Balance</label>
       <span id="usdtBalance">0.0</span>
@@ -186,22 +173,12 @@
     <button id="approveButton" class="approve-btn" disabled>Approve and Buy Momas</button>
   </div>
 
-  <div class="container" id="referral-section" style="display: none;">
-    <h1>Referral Program</h1>
-    <p style="color: #ccc; margin-bottom: 20px;">Invite friends and earn rewards!</p>
-    <div class="input-group">
-      <input type="text" id="referralLink" class="referral-input" value="" readonly placeholder="Connect wallet to get referral link">
-      <button onclick="copyReferralLink()">Copy Link</button>
-    </div>
-    <div class="result">
-      <label>Successful Invites</label>
-      <span id="referralCount">0</span>
-    </div>
-  </div>
+  
+   
 
   <footer class="footer">
     <div class="container mx-auto">
-      <p class="footer-title">Các nhà tài trợ chính</p>
+      <p class="footer-title">Main sponsor</p>
       <div class="sponsor-logos">
         <img 
           src="https://placehold.co/120x40/f0b90b/000000?text=Binance" 
@@ -693,4 +670,5 @@
   </script>
 </body>
 </html>
+
 
