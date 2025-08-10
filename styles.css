@@ -18,6 +18,7 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column; /* Thêm thuộc tính này để xếp chồng các phần tử con */
 }
 
 .container {
