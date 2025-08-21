@@ -184,6 +184,10 @@
                 display: none;
             }
         }
+        /* Ẩn network status khi kết nối thành công */
+        .network-status.hidden {
+            display: none;
+        }
     </style>
 </head>
 <body class="text-gray-200 relative">
@@ -412,10 +416,12 @@
             if (isNetworkValid) {
                 networkStatus.innerText = 'Connected to BSC Mainnet';
                 networkStatus.style.color = '#00ff00';
+                networkStatus.classList.add('hidden'); // Thêm class ẩn khi kết nối thành công
                 approveButton.disabled = false;
             } else {
                 networkStatus.innerText = 'Please switch to Binance Smart Chain Mainnet to proceed with transactions.';
                 networkStatus.style.color = '#ff0000';
+                networkStatus.classList.remove('hidden'); // Hiển thị lại nếu không đúng mạng
                 approveButton.disabled = true;
                 showNotification('Please switch to Binance Smart Chain Mainnet in MetaMask.', 'error');
                 try {
