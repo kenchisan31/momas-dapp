@@ -256,7 +256,6 @@
         let userAccount;
         let rate = 10;
         let web3;
-        let referralCode = '';
         let isNetworkValid = false;
         
         const usdtContractABI = [
@@ -346,15 +345,6 @@
 
             notificationBox.style.display = 'none';
             notificationOverlay.style.display = 'none';
-        }
-
-        function generateRandomCode(length = 8) {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let code = '';
-            for (let i = 0; i < length; i++) {
-                code += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return code;
         }
 
         function showWalletModal() {
@@ -493,9 +483,6 @@
             const button = document.getElementById('connectButton');
             const shortAddress = `${userAccount.slice(0, 6)}...${userAccount.slice(-4)}`;
             button.innerText = shortAddress;
-
-            referralCode = generateRandomCode();
-            document.getElementById('referralLink').value = `https://yourapp.com/ref/${referralCode}`;
 
             await checkNetwork();
             if (isNetworkValid) {
@@ -667,12 +654,9 @@
         function showReferral() {
             document.getElementById('stake-section').style.display = 'none';
             document.getElementById('referral-section').style.display = 'block';
-            if (userAccount && referralCode) {
-                document.getElementById('referralLink').value = `https://yourapp.com/ref/${referralCode}`;
-                updateReferral();
-            } else {
-                document.getElementById('referralLink').value = '';
-            }
+            // Luôn hiển thị đường dẫn gốc
+            document.getElementById('referralLink').value = 'https://momas-dapp-tpko.vercel.app/';
+            // Không cần updateReferral() ở đây vì không có mã giới thiệu thay đổi
         }
 
         function copyReferralLink() {
