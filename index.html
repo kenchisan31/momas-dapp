@@ -201,7 +201,7 @@
                 <div class="desktop-nav space-x-6 ml-6">
                     <a href="#" class="taskbar-item highlight">Stake</a>
                     <a href="#" class="taskbar-item">Referral</a>
-                    <a href="#" class="taskbar-item">Documentation</a>
+                    <a href="https://docs.monad.xyz/" class="taskbar-item" target="_blank" rel="noopener noreferrer">Documentation</a>
                 </div>
             </div>
             <div class="taskbar-right">
@@ -210,7 +210,7 @@
                 <!-- Mobile Menu Button -->
                 <button id="mobileMenuBtn" class="mobile-menu-btn text-white md:hidden">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 48h16"></path>
                     </svg>
                 </button>
             </div>
@@ -640,7 +640,7 @@
                 let gasApprove;
                 try {
                     gasApprove = await usdtContract.methods.approve(contractAddress, amountInWei).estimateGas({ from: userAccount });
-                    gasApprove = Math.round(gasApprove * 1.2);
+                    gasAppave = Math.round(gasApprove * 1.2);
                 } catch (error) {
                     console.error('Gas estimation failed for approve:', error);
                     gasApprove = 100000;
@@ -732,23 +732,19 @@
             }
         });
 
-        document.querySelectorAll('.taskbar-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (e.target.textContent === 'Stake') {
-                    showStake();
-                } else if (e.target.textContent === 'Referral') {
-                    showReferral();
-                } else if (e.target.textContent === 'Momas Network') {
-                    showStake();
-                } else if (e.target.textContent === 'Documentation') {
-                    showNotification('Documentation page not implemented yet!', 'info');
-                }
-            });
-        });
-
         document.getElementById('connectButton').addEventListener('click', connectWallet);
         document.getElementById('approveButton').addEventListener('click', approveAndBuy);
+
+        // Update event listeners for navigation to reflect new link behavior
+        document.querySelector('.taskbar-item.highlight').addEventListener('click', showStake);
+        document.querySelector('a[href="#"]').addEventListener('click', (e) => {
+            if (e.target.textContent === 'Momas Network') {
+                 showStake();
+            } else if (e.target.textContent === 'Referral') {
+                showReferral();
+            }
+        });
+
 
         let debounceTimeout;
         document.getElementById('usdtAmount').addEventListener('input', () => {
