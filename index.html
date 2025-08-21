@@ -135,6 +135,7 @@
             background: rgba(0, 0, 0, 0.5);
             z-index: 1500;
         }
+        /* Style cho taskbar */
         .taskbar {
             @apply bg-gray-900 text-gray-200 p-4 shadow-lg;
         }
@@ -156,6 +157,33 @@
         .connect-wallet-btn {
             @apply bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200;
         }
+        /* Mobile-specific styles */
+        @media (max-width: 767px) {
+            .taskbar-left {
+                display: flex;
+                flex-grow: 1;
+            }
+            .desktop-nav {
+                display: none;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .connect-wallet-btn {
+                padding: 8px 12px;
+            }
+            .taskbar-container {
+                justify-content: space-between;
+            }
+        }
+        @media (min-width: 768px) {
+            .desktop-nav {
+                display: flex;
+            }
+            .mobile-menu-btn {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body class="text-gray-200 relative">
@@ -163,14 +191,24 @@
     <div class="taskbar">
         <div class="taskbar-container">
             <div class="taskbar-left">
-                <a href="#" class="taskbar-item">Momas Network</a>
-                <a href="#" class="taskbar-item highlight">Stake</a>
-                <a href="#" class="taskbar-item">Referral</a>
-                <a href="#" class="taskbar-item">Documentation</a>
+                <!-- Momas logo -->
+                <a href="#" class="taskbar-item text-white font-bold text-xl">Momas Network</a>
+                <!-- Desktop Navigation -->
+                <div class="desktop-nav space-x-6 ml-6">
+                    <a href="#" class="taskbar-item highlight">Stake</a>
+                    <a href="#" class="taskbar-item">Referral</a>
+                    <a href="#" class="taskbar-item">Documentation</a>
+                </div>
             </div>
             <div class="taskbar-right">
                 <button id="connectButton" class="connect-wallet-btn">Connect Wallet</button>
                 <div id="networkStatus" class="network-status"></div>
+                <!-- Mobile Menu Button -->
+                <button id="mobileMenuBtn" class="mobile-menu-btn text-white md:hidden">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
@@ -654,9 +692,7 @@
         function showReferral() {
             document.getElementById('stake-section').style.display = 'none';
             document.getElementById('referral-section').style.display = 'block';
-            // Luôn hiển thị đường dẫn gốc
             document.getElementById('referralLink').value = 'https://momas-dapp-tpko.vercel.app/';
-            // Không cần updateReferral() ở đây vì không có mã giới thiệu thay đổi
         }
 
         function copyReferralLink() {
@@ -669,6 +705,26 @@
             document.execCommand('copy');
             showNotification('Referral link copied to clipboard!', 'success');
         }
+        
+        // Show/hide mobile menu functionality
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const desktopNav = document.querySelector('.desktop-nav');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            if (desktopNav.style.display === 'flex' || desktopNav.style.display === '') {
+                desktopNav.style.display = 'none';
+            } else {
+                desktopNav.style.display = 'flex';
+                desktopNav.style.flexDirection = 'column';
+                desktopNav.style.position = 'absolute';
+                desktopNav.style.top = '100%';
+                desktopNav.style.right = '0';
+                desktopNav.style.backgroundColor = 'rgba(17, 24, 39, 0.9)';
+                desktopNav.style.padding = '1rem';
+                desktopNav.style.borderRadius = '0.5rem';
+                desktopNav.style.zIndex = '50';
+            }
+        });
 
         document.querySelectorAll('.taskbar-item').forEach(item => {
             item.addEventListener('click', (e) => {
