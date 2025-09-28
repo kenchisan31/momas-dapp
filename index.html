@@ -10,8 +10,8 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #210134; /* Nền tối hơn */
-            color: #d1d5db; /* Màu chữ sáng */
+            background-color: #210134; /* Darker background */
+            color: #d1d5db; /* Light text color */
         }
         body::before {
             content: '';
@@ -184,9 +184,33 @@
                 display: none;
             }
         }
-        /* Ẩn network status khi kết nối thành công */
+        /* Hide network status when connection is successful */
         .network-status.hidden {
             display: none;
+        }
+
+        /* Style for Countdown (Binance Yellow) */
+        .countdown-segment {
+            background-color: #3a085d; 
+            color: #f0b90b; /* Binance Yellow */
+            font-weight: 700;
+            font-size: 1.5rem;
+            line-height: 2rem;
+            border-radius: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            min-width: 60px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.1s ease;
+        }
+        .countdown-segment:hover {
+            transform: translateY(-1px);
+        }
+        .countdown-label {
+            font-size: 0.75rem;
+            line-height: 1rem;
+            color: #d1d5db; /* Light gray for label */
+            margin-top: 0.25rem;
         }
     </style>
 </head>
@@ -258,6 +282,31 @@
                     </div>
                 </div>
                 <button id="approveButton" class="bg-purple-600 text-white rounded-lg w-full py-3 mt-6 font-semibold text-lg hover:bg-purple-700">Approve and Buy Momas</button>
+                
+                <!-- Countdown Timer Section -->
+                <div class="mt-6 pt-4 border-t border-gray-700">
+                    <p class="text-sm font-semibold text-center text-gray-400 mb-3">Pre-Sale Ends In:</p>
+                    <div id="countdownTimer" class="flex justify-center space-x-2 sm:space-x-3">
+                        <div class="flex flex-col items-center">
+                            <span id="days" class="countdown-segment">00</span>
+                            <span class="countdown-label">Days</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <span id="hours" class="countdown-segment">00</span>
+                            <span class="countdown-label">Hours</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <span id="minutes" class="countdown-segment">00</span>
+                            <span class="countdown-label">Minutes</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <span id="seconds" class="countdown-segment">00</span>
+                            <span class="countdown-label">Seconds</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Countdown Timer Section -->
+
             </div>
             
             <!-- Referral Section -->
@@ -404,6 +453,8 @@
             } else {
                 showWalletModal();
             }
+            // Initialize countdown timer on page load
+            startCountdown();
         }
 
         async function checkNetwork() {
@@ -416,12 +467,12 @@
             if (isNetworkValid) {
                 networkStatus.innerText = 'Connected to BSC Mainnet';
                 networkStatus.style.color = '#00ff00';
-                networkStatus.classList.add('hidden'); // Thêm class ẩn khi kết nối thành công
+                networkStatus.classList.add('hidden'); // Hide status when connected successfully
                 approveButton.disabled = false;
             } else {
                 networkStatus.innerText = 'Please switch to Binance Smart Chain Mainnet to proceed with transactions.';
                 networkStatus.style.color = '#ff0000';
-                networkStatus.classList.remove('hidden'); // Hiển thị lại nếu không đúng mạng
+                networkStatus.classList.remove('hidden'); // Show if network is incorrect
                 approveButton.disabled = true;
                 showNotification('Please switch to Binance Smart Chain Mainnet in MetaMask.', 'error');
                 try {
@@ -509,12 +560,12 @@
 
                 let totalMomas = 0;
                 for (const event of events) {
-                    const amount = Number(web3.utils.fromWei(event.returnValues.value, 'ether')); // Momas có 18 decimals
+                    const amount = Number(web3.utils.fromWei(event.returnValues.value, 'ether')); 
                     totalMomas += amount;
                 }
 
                 document.getElementById('momasAmount').innerText = totalMomas.toFixed(2);
-                localStorage.setItem(`momasBalance_${userAccount}`, totalMomas.toString()); // Lưu vào localStorage để dự phòng
+                localStorage.setItem(`momasBalance_${userAccount}`, totalMomas.toString()); 
             } catch (error) {
                 console.error('Error fetching Momas balance from events:', error);
                 const storedBalance = localStorage.getItem(`momasBalance_${userAccount}`) || '0';
@@ -533,9 +584,9 @@
                 contract = new web3.eth.Contract(contractABI, contractAddress);
                 try {
                     const rawRate = await contract.methods.rate().call();
-                    rate = Number(rawRate) / 1e12; // Điều chỉnh rate từ hợp đồng: 10 * 1e12 -> 10
+                    rate = Number(rawRate) / 1e12; 
                     if (rate !== 10) {
-                        console.warn(`Rate từ hợp đồng (${rate}) không khớp với kỳ vọng (10). Kiểm tra hợp đồng!`);
+                        console.warn(`Contract rate (${rate}) does not match expected rate (10). Check the contract!`);
                     }
                 } catch (error) {
                     console.error('Error fetching rate from contract:', error);
@@ -711,6 +762,58 @@
             document.execCommand('copy');
             showNotification('Referral link copied to clipboard!', 'success');
         }
+
+        // --- Countdown Logic ---
+        
+        // GLOBAL END DATE: Fixed end date synchronized for all users.
+        // Set to January 7, 2026, 00:00:00 Pacific Time (PST/PDT for California time zone).
+        // Using "PST" or "PDT" ensures the browser adjusts for Daylight Saving Time automatically.
+        const GLOBAL_END_DATE_STRING = "Jan 07, 2026 00:00:00 PST";
+        let countdownEndTimestamp; 
+
+        function startCountdown() {
+            // Convert the fixed date string to a timestamp
+            countdownEndTimestamp = new Date(GLOBAL_END_DATE_STRING).getTime();
+
+            // Start updating the countdown timer every second
+            updateCountdown();
+            updateCountdown.interval = setInterval(updateCountdown, 1000);
+        }
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = countdownEndTimestamp - now; 
+
+            const daysElement = document.getElementById('days');
+            const hoursElement = document.getElementById('hours');
+            const minutesElement = document.getElementById('minutes');
+            const secondsElement = document.getElementById('seconds');
+            const timerContainer = document.getElementById('countdownTimer').parentElement;
+
+            if (distance < 0) {
+                clearInterval(updateCountdown.interval);
+                daysElement.innerText = '00';
+                hoursElement.innerText = '00';
+                minutesElement.innerText = '00';
+                secondsElement.innerText = '00';
+                // Updated to English
+                timerContainer.querySelector('p').innerText = 'PRE-SALE HAS ENDED!';
+                return;
+            }
+
+            // Calculate time
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Display
+            daysElement.innerText = String(days).padStart(2, '0');
+            hoursElement.innerText = String(hours).padStart(2, '0');
+            minutesElement.innerText = String(minutes).padStart(2, '0');
+            secondsElement.innerText = String(seconds).padStart(2, '0');
+        }
+        // --- End Countdown Logic ---
         
         // Show/hide mobile menu functionality
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
