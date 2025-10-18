@@ -376,10 +376,11 @@
         // =======================================================
         
         // Thay đổi giá trị này thành thời điểm kết thúc Pre-Sale thực tế của bạn
-        // Lưu ý: Định dạng là "Tháng Ngày, Năm Giờ:Phút:Giây GMT+MúiGiờ"
-        const END_DATE_STRING = "Nov 1, 2025 00:00:00 GMT+0700"; 
+        // Đặt ngày kết thúc 80 ngày (7/1/2026) theo GIỜ MIỀN ĐÔNG MỸ (EST: GMT-0500)
+        const END_DATE_STRING = "Jan 7, 2026 00:00:00 GMT-0500";
         const END_DATE = new Date(END_DATE_STRING).getTime();
         let countdownInterval;
+        
 
         function startCountdown() {
             // Chạy lần đầu tiên để hiển thị ngay lập tức
@@ -899,3 +900,4 @@
     </script>
 </body>
 </html>
+
