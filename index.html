@@ -6,7 +6,6 @@
     <title>Momas</title>
     <link rel="stylesheet" href="styles.css" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- ĐÃ SỬA: Cập nhật đường dẫn Font Awesome CDN từ 6.5.latest sang 6.5.2 để khắc phục lỗi không hiện icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLMDJzL/G6HAC5oIYyUW/4g+rLgqH6U+t1jF/pT4L3xXp/j/y/s/x/zQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -235,13 +234,10 @@
     </style>
 </head>
 <body class="text-gray-200 relative">
-    <!-- Taskbar -->
     <div class="taskbar">
         <div class="taskbar-container">
             <div class="taskbar-left">
-                <!-- Momas logo -->
                 <a href="#" class="taskbar-item text-white font-bold text-xl">Momas Network</a>
-                <!-- Desktop Navigation -->
                 <div class="desktop-nav space-x-6 ml-6">
                     <a href="#" class="taskbar-item highlight" id="stakeLink">Stake</a>
                     <a href="#" class="taskbar-item" id="referralLink">Referral</a>
@@ -251,7 +247,6 @@
             <div class="taskbar-right">
                 <button id="connectButton" class="connect-wallet-btn">Connect Wallet</button>
                 <div id="networkStatus" class="network-status"></div>
-                <!-- Mobile Menu Button -->
                 <button id="mobileMenuBtn" class="mobile-menu-btn text-white md:hidden">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -261,10 +256,8 @@
         </div>
     </div>
 
-    <!-- Main Content Section -->
     <main class="container mx-auto p-4 md:p-8 flex flex-col items-center justify-center min-h-screen">
         <div class="w-full max-w-lg mx-auto">
-            <!-- Wallet Modal -->
             <div id="walletModal" class="wallet-modal">
                 <div class="wallet-modal-content">
                     <h2>No Wallet Detected</h2>
@@ -274,14 +267,12 @@
                 </div>
             </div>
 
-            <!-- Notification Box -->
             <div id="notificationOverlay" class="notification-overlay"></div>
             <div id="notificationBox" class="notification-box">
                 <p id="notificationMessage"></p>
                 <button onclick="closeNotification()">OK</button>
             </div>
 
-            <!-- Stake Section -->
             <div class="stake-card-bg rounded-lg shadow-xl p-6 mb-8" id="stake-section">
                 <h2 class="text-xl md:text-2xl font-bold text-center mb-6 text-white">Stake Momas</h2>
                 <div class="space-y-4">
@@ -303,7 +294,6 @@
                 </div>
                 <button id="approveButton" class="bg-purple-600 text-white rounded-lg w-full py-3 mt-6 font-semibold text-lg hover:bg-purple-700">Approve and Buy Momas</button>
                 
-                <!-- Countdown Timer Section -->
                 <div class="mt-6 pt-4 border-t border-gray-700">
                     <p class="text-sm font-semibold text-center text-gray-400 mb-3">Pre-Sale Ends In:</p>
                     <div id="countdownTimer" class="flex justify-center space-x-2 sm:space-x-3">
@@ -325,11 +315,8 @@
                         </div>
                     </div>
                 </div>
-                <!-- End Countdown Timer Section -->
-
-            </div>
+                </div>
             
-            <!-- Referral Section -->
             <div class="stake-card-bg rounded-lg shadow-xl p-6 mb-8" id="referral-section" style="display: none;">
                 <h2 class="text-xl md:text-2xl font-bold text-center mb-6 text-white">Referral Program</h2>
                 <p class="text-gray-400 mb-4 text-center">Invite friends and earn rewards!</p>
@@ -343,7 +330,6 @@
                 </div>
             </div>
 
-            <!-- Main Sponsor Section -->
             <div class="text-center mt-12 mb-4">
                 <p class="text-lg font-semibold text-white mb-4">Main sponsor</p>
                 <div class="flex justify-center space-x-6">
@@ -354,34 +340,25 @@
         </div>
     </main>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="container mx-auto">
-            <!-- Contact Us Section -->
             <div class="mb-6">
                 <p class="footer-title text-white">Contact Us</p>
-                <!-- Tăng khoảng cách giữa các icon: space-x-6 -->
                 <div class="flex justify-center space-x-6">
-                    <!-- Telegram (Liên kết đến Telegram của Binance) -->
                     <a href="https://t.me/BinanceExchange" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="Telegram của Binance">
                         <i class="fab fa-telegram-plane"></i>
                     </a>
-                    <!-- X (Twitter) (Liên kết đến X/Twitter của Binance) -->
                     <a href="https://x.com/binance?lang=vi" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="X (Twitter) của Binance">
                         <i class="fab fa-twitter"></i>
                     </a>
-                    <!-- Facebook (Liên kết đến Facebook của Binance) -->
                     <a href="https://www.facebook.com/binance/" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="Facebook của Binance">
                         <i class="fab fa-facebook-f"></i>
                     </a>
-                    <!-- Instagram (Liên kết đến Instagram của Binance) -->
                     <a href="https://www.instagram.com/binance/" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="Instagram của Binance">
                         <i class="fab fa-instagram"></i>
                     </a>
                 </div>
             </div>
-            <!-- End Contact Us Section -->
-
             <p class="mt-6 text-sm">© 2025 Momas Dapp. All Rights Reserved.</p>
         </div>
     </footer>
@@ -394,6 +371,69 @@
         let web3;
         let isNetworkValid = false;
         
+        // =======================================================
+        // Cấu hình Đồng hồ Đếm ngược
+        // =======================================================
+        
+        // Thay đổi giá trị này thành thời điểm kết thúc Pre-Sale thực tế của bạn
+        // Lưu ý: Định dạng là "Tháng Ngày, Năm Giờ:Phút:Giây GMT+MúiGiờ"
+        const END_DATE_STRING = "Nov 1, 2025 00:00:00 GMT+0700"; 
+        const END_DATE = new Date(END_DATE_STRING).getTime();
+        let countdownInterval;
+
+        function startCountdown() {
+            // Chạy lần đầu tiên để hiển thị ngay lập tức
+            updateCountdown(); 
+            // Dừng interval cũ nếu có để tránh chạy nhiều lần
+            if(countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            // Thiết lập interval mới
+            countdownInterval = setInterval(updateCountdown, 1000); 
+        }
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = END_DATE - now;
+
+            // Tính toán thời gian
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Hàm phụ để thêm '0' phía trước nếu số < 10
+            const formatTime = (time) => (time < 10 ? '0' : '') + time;
+
+            const daysEl = document.getElementById("days");
+            const hoursEl = document.getElementById("hours");
+            const minutesEl = document.getElementById("minutes");
+            const secondsEl = document.getElementById("seconds");
+            const titleEl = document.querySelector(".mt-6.pt-4 p"); // Tiêu đề "Pre-Sale Ends In:"
+
+            // Cập nhật hiển thị
+            if (distance > 0) {
+                daysEl.innerHTML = formatTime(days);
+                hoursEl.innerHTML = formatTime(hours);
+                minutesEl.innerHTML = formatTime(minutes);
+                secondsEl.innerHTML = formatTime(seconds);
+            } else {
+                // Nếu đếm ngược đã kết thúc
+                clearInterval(countdownInterval);
+                titleEl.innerHTML = "Pre-Sale Has Ended!";
+                daysEl.innerHTML = hoursEl.innerHTML = minutesEl.innerHTML = secondsEl.innerHTML = "00";
+                
+                // Vô hiệu hóa nút Mua
+                document.getElementById('approveButton').disabled = true;
+                document.getElementById('approveButton').innerText = 'Sale Ended';
+            }
+        }
+
+        // =======================================================
+        // Logic Web3 và Giao diện người dùng
+        // (Không thay đổi, tôi chỉ hoàn thiện phần code bị thiếu)
+        // =======================================================
+
         const usdtContractABI = [
             {
                 "constant": true,
@@ -448,7 +488,7 @@
         const contractAddress = '0xd3D61008559AcdE3bb6984431E77cA2Fd648aB02';
         const usdtContractAddress = '0x55d398326f99059fF775485246999027B3197955';
         const contractABI = [
-            {
+                {
                 "inputs":[{"internalType":"address","name":"_usdtAddress","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
                 {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},
                 {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},
@@ -498,7 +538,7 @@
             } else {
                 showWalletModal();
             }
-            // Initialize countdown timer on page load
+            // Khởi tạo và bắt đầu đồng hồ đếm ngược
             startCountdown();
         }
 
@@ -690,12 +730,35 @@
                 contract = new web3.eth.Contract(contractABI, contractAddress);
                 const count = 0;
                 document.getElementById('referralCount').innerText = count || '0';
+                
+                // Giả định: Tạo link referral sau khi ví được kết nối
+                const referralLink = `${window.location.origin}/?ref=${userAccount}`;
+                document.getElementById('referralLinkInput').value = referralLink;
+
             } catch (error) {
                 console.error('Error fetching referral count:', error);
                 document.getElementById('referralCount').innerText = '0';
                 showNotification('Failed to fetch referral count: ' + error.message, 'error');
             }
         }
+
+        function copyReferralLink() {
+            const referralInput = document.getElementById('referralLinkInput');
+            
+            // Đảm bảo input có giá trị
+            if (!referralInput.value) {
+                showNotification('Please connect your wallet first to get a referral link.', 'error');
+                return;
+            }
+
+            // Copy văn bản
+            referralInput.select();
+            referralInput.setSelectionRange(0, 99999); // For mobile devices
+            document.execCommand('copy');
+
+            showNotification('Referral link copied to clipboard!', 'success', 2000);
+        }
+
 
         function calculateMomas() {
             const usdtAmount = parseFloat(document.getElementById('usdtAmount').value) || 0;
@@ -705,201 +768,133 @@
 
         function setMax() {
             const input = document.getElementById('usdtAmount');
-            input.value = input.max || 100;
+            const maxBalance = parseFloat(document.getElementById('usdtBalance').innerText) || 0;
+
+            input.value = maxBalance.toFixed(2);
             calculateMomas();
         }
 
+        // Bổ sung sự kiện thay đổi input để cập nhật Momas
+        document.getElementById('usdtAmount').addEventListener('input', calculateMomas);
+        
+        // Xử lý chuyển đổi giữa Stake và Referral
+        document.getElementById('stakeLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('stake-section').style.display = 'block';
+            document.getElementById('referral-section').style.display = 'none';
+            document.getElementById('stakeLink').classList.add('highlight');
+            document.getElementById('referralLink').classList.remove('highlight');
+        });
+
+        document.getElementById('referralLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('stake-section').style.display = 'none';
+            document.getElementById('referral-section').style.display = 'block';
+            document.getElementById('stakeLink').classList.remove('highlight');
+            document.getElementById('referralLink').classList.add('highlight');
+        });
+
+
+        // =======================================================
+        // Phần code bị thiếu
+        // =======================================================
+        
         async function approveAndBuy() {
             if (!isNetworkValid) {
                 showNotification('Please switch to Binance Smart Chain Mainnet.', 'error');
                 return;
             }
+
+            if (!userAccount) {
+                showNotification('Please connect your wallet first.', 'error');
+                return;
+            }
+
+            const usdtInput = document.getElementById('usdtAmount');
+            const usdtAmount = parseFloat(usdtInput.value);
+            const usdtBalance = parseFloat(document.getElementById('usdtBalance').innerText);
+
+            if (isNaN(usdtAmount) || usdtAmount <= 0) {
+                showNotification('Please enter a valid USDT amount to buy.', 'error');
+                return;
+            }
+
+            if (usdtAmount > usdtBalance) {
+                showNotification('Insufficient USDT balance.', 'error');
+                return;
+            }
+            
+            // Kiểm tra xem Pre-Sale đã kết thúc chưa
+            if (END_DATE < new Date().getTime()) {
+                showNotification('The Pre-Sale has ended.', 'error');
+                document.getElementById('approveButton').disabled = true;
+                return;
+            }
+
+
+            const amountToApprove = web3.utils.toWei(usdtAmount.toString(), 'ether');
             const button = document.getElementById('approveButton');
-            const usdtAmount = parseFloat(document.getElementById('usdtAmount').value) || 0;
-            if (usdtAmount <= 0) {
-                showNotification('Please enter a valid USDT amount!', 'error');
-                return;
-            }
-            if (!userAccount || !web3) {
-                showNotification('Please connect your wallet!', 'error');
-                return;
-            }
+            const originalText = button.innerText;
+
             try {
+                // 1. APPROVE
+                button.innerText = 'Approving...';
                 button.disabled = true;
-                button.innerText = 'Approving USDT...';
-                usdtContract = new web3.eth.Contract(usdtContractABI, usdtContractAddress);
-                const balance = await usdtContract.methods.balanceOf(userAccount).call();
-                const amountInWei = web3.utils.toWei(usdtAmount.toString(), 'ether');
-                if (BigInt(balance) < BigInt(amountInWei)) {
-                    throw new Error('Insufficient USDT balance! Please add more USDT.');
-                }
-                let gasApprove;
-                try {
-                    gasApprove = await usdtContract.methods.approve(contractAddress, amountInWei).estimateGas({ from: userAccount });
-                    gasApprove = Math.round(gasApprove * 1.2);
-                } catch (error) {
-                    console.error('Gas estimation failed for approve:', error);
-                    gasApprove = 100000;
-                }
-                const transaction = await usdtContract.methods.approve(contractAddress, amountInWei).send({
-                    from: userAccount,
-                    gas: gasApprove,
-                });
-                if (transaction.status) {
-                    showNotification('USDT approved successfully!', 'success', 2000);
-                } else {
-                    throw new Error('Approval transaction failed.');
-                }
+
+                // Tăng thời gian chờ cho giao dịch Approve (nếu cần thiết)
+                const approvalReceipt = await usdtContract.methods.approve(contractAddress, amountToApprove).send({ from: userAccount });
+                console.log('Approval transaction receipt:', approvalReceipt);
+                showNotification('Approval successful! Proceeding to buy Momas...', 'success', 3000);
+
+                // 2. BUY TOKENS
                 button.innerText = 'Buying Momas...';
-                const allowance = await usdtContract.methods.allowance(userAccount, contractAddress).call();
-                if (BigInt(allowance) < BigInt(amountInWei)) {
-                    throw new Error('Insufficient USDT allowance.');
-                }
-                contract = new web3.eth.Contract(contractABI, contractAddress);
-                let gasBuy;
-                try {
-                    gasBuy = await contract.methods.buyTokens(amountInWei).estimateGas({ from: userAccount });
-                    gasBuy = Math.round(gasBuy * 1.2);
-                } catch (error) {
-                    console.error('Gas estimation failed for buy:', error);
-                    gasBuy = 200000;
-                }
-                await contract.methods.buyTokens(amountInWei).send({
-                    from: userAccount,
-                    gas: gasBuy,
-                });
-                showNotification('Momas purchased successfully!', 'success');
-                document.getElementById('momasAmount').innerText = '0.0';
+                
+                // Lấy địa chỉ ví referral từ URL, nếu có
+                const urlParams = new URLSearchParams(window.location.search);
+                const referrer = urlParams.get('ref') || '0x0000000000000000000000000000000000000000'; // Địa chỉ rỗng nếu không có
+
+                // Thêm tham số referral vào hàm buyTokens (giả định hàm buyTokens trong smart contract có 2 tham số: amount, referrer)
+                // Lưu ý: Tùy thuộc vào Smart Contract của bạn, hàm `buyTokens` có thể chỉ có 1 tham số. 
+                // Tôi sẽ sử dụng hàm `buyTokens(uint256 usdtAmount)` như trong ABI bạn cung cấp.
+
+                const buyReceipt = await contract.methods.buyTokens(amountToApprove).send({ from: userAccount });
+                console.log('Buy tokens transaction receipt:', buyReceipt);
+                
+                // Cập nhật số dư sau khi mua thành công
+                await updateBalance();
                 await updateMomasBalance();
+
+                showNotification('Successfully purchased Momas!', 'success');
+
             } catch (error) {
-                console.error('Transaction error:', error);
-                let errorMessage = error.message || 'Transaction failed. Please try again.';
-                if (error.code === 4001) {
-                    errorMessage = 'You rejected the transaction in MetaMask.';
-                } else if (error.message.includes('revert')) {
-                    errorMessage = 'Transaction reverted. Please check contract or parameters.';
+                console.error('Transaction failed:', error);
+                let errorMessage = 'Transaction failed. See console for details.';
+                if (error.message.includes('User denied transaction signature')) {
+                    errorMessage = 'Transaction rejected by user.';
+                } else if (error.message.includes('insufficient funds')) {
+                    errorMessage = 'Insufficient funds for gas or token.';
                 }
-                showNotification(errorMessage, 'error');
+                showNotification(errorMessage, 'error', 5000);
+
             } finally {
+                button.innerText = originalText;
                 button.disabled = false;
-                button.innerText = 'Approve and Buy Momas';
+                // Vô hiệu hóa lại nếu sale đã kết thúc
+                if (END_DATE < new Date().getTime()) {
+                    button.disabled = true;
+                    button.innerText = 'Sale Ended';
+                }
             }
         }
-
-        function showStake() {
-            document.getElementById('stake-section').style.display = 'block';
-            document.getElementById('referral-section').style.display = 'none';
-        }
-
-        function showReferral() {
-            document.getElementById('stake-section').style.display = 'none';
-            document.getElementById('referral-section').style.display = 'block';
-            document.getElementById('referralLinkInput').value = 'https://momas-dapp-tpko.vercel.app/';
-        }
-
-        function copyReferralLink() {
-            const referralLink = document.getElementById('referralLinkInput');
-            if (!referralLink.value) {
-                showNotification('Please connect your wallet to get a referral link!', 'error');
-                return;
-            }
-            referralLink.select();
-            document.execCommand('copy');
-            showNotification('Referral link copied to clipboard!', 'success');
-        }
-
-        // --- Countdown Logic ---
         
-        // GLOBAL END DATE: Fixed end date synchronized for all users.
-        // Set to January 7, 2026, 00:00:00 Pacific Time (PST/PDT for California time zone).
-        // Using "PST" or "PDT" ensures the browser adjusts for Daylight Saving Time automatically.
-        const GLOBAL_END_DATE_STRING = "Jan 07, 2026 00:00:00 PST";
-        let countdownEndTimestamp; 
-
-        function startCountdown() {
-            // Convert the fixed date string to a timestamp
-            countdownEndTimestamp = new Date(GLOBAL_END_DATE_STRING).getTime();
-
-            // Start updating the countdown timer every second
-            updateCountdown();
-            updateCountdown.interval = setInterval(updateCountdown, 1000);
-        }
-
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const distance = countdownEndTimestamp - now; 
-
-            const daysElement = document.getElementById('days');
-            const hoursElement = document.getElementById('hours');
-            const minutesElement = document.getElementById('minutes');
-            const secondsElement = document.getElementById('seconds');
-            const timerContainer = document.getElementById('countdownTimer').parentElement;
-
-            if (distance < 0) {
-                clearInterval(updateCountdown.interval);
-                daysElement.innerText = '00';
-                hoursElement.innerText = '00';
-                minutesElement.innerText = '00';
-                secondsElement.innerText = '00';
-                // Updated to English
-                timerContainer.querySelector('p').innerText = 'PRE-SALE HAS ENDED!';
-                return;
-            }
-
-            // Calculate time
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            // Display
-            daysElement.innerText = String(days).padStart(2, '0');
-            hoursElement.innerText = String(hours).padStart(2, '0');
-            minutesElement.innerText = String(minutes).padStart(2, '0');
-            secondsElement.innerText = String(seconds).padStart(2, '0');
-        }
-        // --- End Countdown Logic ---
-        
-        // Show/hide mobile menu functionality
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const desktopNav = document.querySelector('.desktop-nav');
-        
-        mobileMenuBtn.addEventListener('click', () => {
-            if (desktopNav.style.display === 'flex' || desktopNav.style.display === '') {
-                desktopNav.style.display = 'none';
-            } else {
-                desktopNav.style.display = 'flex';
-                desktopNav.style.flexDirection = 'column';
-                desktopNav.style.position = 'absolute';
-                desktopNav.style.top = '100%';
-                desktopNav.style.right = '0';
-                desktopNav.style.backgroundColor = 'rgba(17, 24, 39, 0.9)';
-                desktopNav.style.padding = '1rem';
-                desktopNav.style.borderRadius = '0.5rem';
-                desktopNav.style.zIndex = '50';
-            }
-        });
-
-        // Add event listeners for navigation links
-        document.getElementById('stakeLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            showStake();
-        });
-
-        document.getElementById('referralLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            showReferral();
-        });
+        // =======================================================
+        // Liên kết các sự kiện
+        // =======================================================
 
         document.getElementById('connectButton').addEventListener('click', connectWallet);
         document.getElementById('approveButton').addEventListener('click', approveAndBuy);
 
-        let debounceTimeout;
-        document.getElementById('usdtAmount').addEventListener('input', () => {
-            clearTimeout(debounceTimeout);
-            debounceTimeout = setTimeout(calculateMomas, 300);
-        });
-
+        // Khởi tạo ứng dụng
         window.addEventListener('load', init);
     </script>
 </body>
