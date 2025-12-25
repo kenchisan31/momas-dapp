@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Momas AI - Future of Decentralized Intelligence</title>
+    <title>Momas AI - Decentralized Intelligence Ecosystem</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -18,6 +18,7 @@
         input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        .roadmap-line { position: absolute; left: 20px; top: 0; bottom: 0; width: 2px; background: rgba(59, 130, 246, 0.2); }
     </style>
 </head>
 <body class="min-h-screen">
@@ -26,24 +27,24 @@
 
     <aside id="sidebar" class="fixed left-0 top-0 h-full w-72 bg-[#0a0f1e] border-r border-white/5 z-50 p-6 transition-transform -translate-x-full md:translate-x-0">
         <div class="flex items-center gap-3 mb-10">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
                 <i class="fas fa-brain text-white"></i>
             </div>
             <h1 class="text-2xl font-bold tracking-tight italic">MOMAS AI</h1>
         </div>
         <nav class="space-y-3">
-            <button onclick="switchTab('dashboard')" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-white/5 transition text-slate-400 font-semibold" id="nav-dashboard">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-4 p-4 rounded-2xl transition text-slate-400 font-semibold bg-blue-600/10 text-blue-500">
                 <i class="fas fa-chart-line w-5"></i> Dashboard
             </button>
-            <button onclick="switchTab('buy')" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-white/5 transition text-slate-400 font-semibold" id="nav-buy">
-                <i class="fas fa-microchip w-5"></i> About Us
+            <button onclick="switchTab('buy')" id="nav-buy" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-white/5 transition text-slate-400 font-semibold">
+                <i class="fas fa-microchip w-5"></i> Ecosystem & AI
             </button>
         </nav>
         
         <div class="absolute bottom-10 left-6 right-6 p-5 glass-card rounded-3xl border-blue-500/20">
             <p class="text-[10px] text-blue-400 uppercase font-bold mb-1 tracking-widest">My Wallet Balance</p>
             <p id="userBalance" class="text-lg font-bold text-white">0.0 USDT</p>
-            <div class="text-[9px] text-slate-500 mt-1">Real-time update</div>
+            <div class="text-[9px] text-slate-500 mt-1 italic">Tự động cập nhật từ ví</div>
         </div>
     </aside>
 
@@ -51,8 +52,7 @@
         <header class="p-6 md:px-10 flex justify-between items-center sticky top-0 z-30 bg-[#050810]/80 backdrop-blur-md">
             <button onclick="toggleSidebar()" class="md:hidden text-2xl"><i class="fas fa-bars text-slate-400"></i></button>
             <div class="hidden md:block">
-                <span class="text-slate-500 text-sm font-medium">Network:</span>
-                <span class="text-green-500 text-sm font-bold ml-1">● BNB Smart Chain</span>
+                <span class="text-green-500 text-sm font-bold">● Live: BNB Smart Chain</span>
             </div>
             
             <div class="flex items-center gap-4">
@@ -66,29 +66,25 @@
         </header>
 
         <main id="tab-dashboard" class="tab-content active p-6 md:p-10 max-w-6xl mx-auto">
-            <div class="mb-10">
-                <h2 class="text-3xl font-bold mb-2">Welcome to <span class="ai-gradient">MOMAS AI</span></h2>
-                <p class="text-slate-400">A next-generation decentralized artificial intelligence platform..</p>
+            <div class="mb-10 text-center md:text-left">
+                <h2 class="text-4xl font-extrabold mb-2">Presale <span class="ai-gradient">MOMAS AI</span></h2>
+                <p class="text-slate-400">Own tokens of the next-generation artificial intelligence platform today!.</p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                <div class="glass-card rounded-[2rem] p-8 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-8 opacity-10 text-6xl"><i class="fas fa-rocket"></i></div>
-                    <h3 class="text-slate-400 text-xs font-bold uppercase mb-4 tracking-widest">Presale Funding Progress</h3>
-                    <div class="text-4xl font-bold mb-6 italic" id="raiseText">0 <span class="text-lg text-slate-500 font-normal">/ 85,000,000 USDT</span></div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                <div class="glass-card rounded-[2rem] p-8">
+                    <h3 class="text-slate-400 text-xs font-bold uppercase mb-4 tracking-widest">SUCCESSFUL FUNDRAISING</h3>
+                    <div class="text-4xl font-bold mb-6 italic" id="raiseText">30,000,000 <span class="text-lg text-slate-500 font-normal">/ 85,000,000 USDT</span></div>
                     <div class="w-full bg-white/5 h-4 rounded-full overflow-hidden p-1 border border-white/5">
-                        <div id="progressBar" class="bg-gradient-to-r from-blue-600 to-purple-500 h-full rounded-full transition-all duration-1000 shadow-[0_0_15px_rgba(59,130,246,0.5)]" style="width: 0%"></div>
+                        <div id="progressBar" class="bg-gradient-to-r from-blue-600 to-purple-500 h-full rounded-full transition-all duration-1000" style="width: 35%"></div>
                     </div>
-                    <p class="text-[11px] text-slate-500 mt-4 font-medium uppercase italic">Auto-sync with blockchain nodes</p>
                 </div>
 
                 <div class="glass-card rounded-[2rem] p-8 text-center border-white/5">
-                    <h3 class="text-blue-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-8">Project Closing In</h3>
+                    <h3 class="text-blue-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-6">END (31/01/2026)</h3>
                     <div class="flex justify-center gap-6">
                         <div class="flex flex-col"><span id="days" class="text-4xl font-bold mb-1">00</span><span class="text-[10px] text-slate-500 font-bold uppercase">Days</span></div>
-                        <div class="text-4xl font-light text-white/20">:</div>
                         <div class="flex flex-col"><span id="hours" class="text-4xl font-bold mb-1">00</span><span class="text-[10px] text-slate-500 font-bold uppercase">Hours</span></div>
-                        <div class="text-4xl font-light text-white/20">:</div>
                         <div class="flex flex-col"><span id="mins" class="text-4xl font-bold mb-1">00</span><span class="text-[10px] text-slate-500 font-bold uppercase">Mins</span></div>
                     </div>
                 </div>
@@ -97,8 +93,8 @@
             <div class="max-w-xl mx-auto">
                 <div class="glass-card rounded-[3rem] p-10 border-t border-white/10 shadow-2xl">
                     <div class="flex justify-between items-center mb-10">
-                        <h2 class="text-2xl font-bold italic tracking-tighter">GET $MOMAS</h2>
-                        <span class="text-[10px] bg-blue-500/20 text-blue-400 px-4 py-1.5 rounded-full font-bold border border-blue-500/20 uppercase tracking-widest">Fixed Rate: 10x</span>
+                        <h2 class="text-2xl font-bold italic tracking-tighter">BUY MOMAS</h2>
+                        <span class="text-[10px] bg-blue-500/20 text-blue-400 px-4 py-1.5 rounded-full font-bold border border-blue-500/20 uppercase tracking-widest">1 USDT = 10 MOMAS</span>
                     </div>
 
                     <div class="space-y-6">
@@ -108,8 +104,8 @@
                         </div>
 
                         <div class="bg-white/5 p-6 rounded-3xl border border-white/5">
-                            <label class="text-[10px] text-slate-500 uppercase font-bold mb-3 block">You will receive MOMAS </label>
-                            <input type="text" id="tokenReceived" readonly placeholder="0.0" class="bg-transparent text-3xl font-bold w-full outline-none text-blue-400 placeholder:text-blue-400/20">
+                            <label class="text-[10px] text-slate-500 uppercase font-bold mb-3 block">Estimated MOMAS receipts</label>
+                            <input type="text" id="tokenReceived" readonly placeholder="0.0" class="bg-transparent text-3xl font-bold w-full outline-none text-blue-400">
                         </div>
 
                         <button id="mainBtn" onclick="handleAction()" class="w-full bg-blue-600 hover:bg-blue-700 p-6 rounded-[1.5rem] font-extrabold transition text-white text-lg active:scale-95 flex items-center justify-center gap-3 glow-btn">
@@ -120,113 +116,65 @@
             </div>
         </main>
 
-      <main id="tab-buy" class="tab-content p-6 md:p-10 max-w-6xl mx-auto">
-    <div class="text-center mb-16">
-        <h2 class="text-5xl font-extrabold mb-6">Hệ Sinh Thái <span class="ai-gradient">MOMAS AI</span></h2>
-        <p class="text-slate-400 text-lg max-w-2xl mx-auto italic">"Tiên phong kết hợp trí tuệ nhân tạo phi tập trung vào nền kinh tế số toàn cầu."</p>
+        <main id="tab-buy" class="tab-content p-6 md:p-10 max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-extrabold mb-6">MOMAS <span class="ai-gradient">AI Ecosystem</span></h2>
+                <p class="text-slate-400 text-lg max-w-2xl mx-auto">A decentralized AI platform connects user data with global machine learning models via Smart Contracts..</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+                <div class="glass-card p-8 rounded-3xl border-white/5 hover:bg-white/5 transition">
+                    <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-blue-500/20"><i class="fas fa-brain text-white"></i></div>
+                    <h4 class="text-xl font-bold mb-3">AI Deep Learning</h4>
+                    <p class="text-slate-400 text-sm">The system learns from DeFi transactions to optimize profits for token holders..</p>
+                </div>
+                <div class="glass-card p-8 rounded-3xl border-white/5 hover:bg-white/5 transition">
+                    <div class="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-purple-500/20"><i class="fas fa-shield-alt text-white"></i></div>
+                    <h4 class="text-xl font-bold mb-3">Secure Nodes</h4>
+                    <p class="text-slate-400 text-sm">Multi-layered security combined with the computing power of a decentralized node network..</p>
+                </div>
+                <div class="glass-card p-8 rounded-3xl border-white/5 hover:bg-white/5 transition">
+                    <div class="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-green-500/20"><i class="fas fa-database text-white"></i></div>
+                    <h4 class="text-xl font-bold mb-3">Data Monetization</h4>
+                    <p class="text-slate-400 text-sm">Users can earn passive income by contributing data to AI models.</p>
+                </div>
+            </div>
+
+            <div class="mb-20">
+                <h3 class="text-3xl font-bold text-center mb-12 italic uppercase"> Roadmap </h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="glass-card p-6 rounded-2xl border-l-4 border-blue-500">
+                        <span class="text-blue-500 font-bold text-xs">Q4 2025</span>
+                        <h5 class="font-bold mt-2">Launch</h5>
+                        <p class="text-[11px] text-slate-500 mt-2 italic">Smart Contract Release & Presale Launch Phase 1.</p>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl border-l-4 border-purple-500">
+                        <span class="text-purple-500 font-bold text-xs">Q1 2026</span>
+                        <h5 class="font-bold mt-2">Listing</h5>
+                        <p class="text-[11px] text-slate-500 mt-2 italic">Listing PancakeSwap and major CEX exchanges. Launching Staking..</p>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl border-l-4 border-yellow-500">
+                        <span class="text-yellow-500 font-bold text-xs">Q2 2026</span>
+                        <h5 class="font-bold mt-2">Extend</h5>
+                        <p class="text-[11px] text-slate-500 mt-2 italic">Mainnet Momas AI Chain & AI Technology Partnerships.</p>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl border-l-4 border-green-500">
+                        <span class="text-green-500 font-bold text-xs">Q3 2026</span>
+                        <h5 class="font-bold mt-2">Dominate</h5>
+                        <p class="text-[11px] text-slate-500 mt-2 italic">Launching the Momos Super App & Listing on Binance globally..</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button onclick="switchTab('dashboard')" class="bg-blue-600 px-10 py-4 rounded-2xl font-bold shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition">MUA TOKEN NGAY</button>
+            </div>
+        </main>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-        <div class="glass-card p-8 rounded-3xl border-white/5 hover:border-blue-500/30 transition group">
-            <div class="w-14 h-14 bg-blue-600/20 rounded-2xl flex items-center justify-center mb-6 text-blue-500 text-2xl group-hover:scale-110 transition">
-                <i class="fas fa-brain"></i>
-            </div>
-            <h4 class="text-xl font-bold mb-3">AI Training Hub</h4>
-            <p class="text-slate-400 text-sm leading-relaxed">Cung cấp sức mạnh tính toán cho các mô hình ngôn ngữ lớn (LLM) và nhận thưởng bằng $MOMAS.</p>
-        </div>
-        <div class="glass-card p-8 rounded-3xl border-white/5 hover:border-purple-500/30 transition group">
-            <div class="w-14 h-14 bg-purple-600/20 rounded-2xl flex items-center justify-center mb-6 text-purple-500 text-2xl group-hover:scale-110 transition">
-                <i class="fas fa-network-wired"></i>
-            </div>
-            <h4 class="text-xl font-bold mb-3">Decentralized Nodes</h4>
-            <p class="text-slate-400 text-sm leading-relaxed">Hệ thống Node bảo mật giúp vận hành mạng lưới AI không cần máy chủ trung tâm.</p>
-        </div>
-        <div class="glass-card p-8 rounded-3xl border-white/5 hover:border-green-500/30 transition group">
-            <div class="w-14 h-14 bg-green-600/20 rounded-2xl flex items-center justify-center mb-6 text-green-500 text-2xl group-hover:scale-110 transition">
-                <i class="fas fa-database"></i>
-            </div>
-            <h4 class="text-xl font-bold mb-3">Big Data AI</h4>
-            <p class="text-slate-400 text-sm leading-relaxed">Phân tích dữ liệu thị trường Crypto theo thời gian thực với độ chính xác 99.9%.</p>
-        </div>
-    </div>
+    
 
-    <div class="mb-20">
-        <h3 class="text-3xl font-bold text-center mb-12 italic uppercase tracking-widest">Project Roadmap 2025 - 2026</h3>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="relative p-6 bg-white/5 rounded-2xl border-l-4 border-blue-500">
-                <span class="text-blue-500 font-bold text-xs">Q4 2025</span>
-                <h5 class="font-bold mt-2">KHỞI CHẠY</h5>
-                <ul class="text-[11px] text-slate-500 mt-3 space-y-2">
-                    <li>● Ra mắt Smart Contract Presale</li>
-                    <li>● Audit Security bởi Certik</li>
-                    <li>● Chiến dịch Marketing toàn cầu</li>
-                </ul>
-            </div>
-            <div class="relative p-6 bg-white/5 rounded-2xl border-l-4 border-purple-500">
-                <span class="text-purple-500 font-bold text-xs">Q1 2026</span>
-                <h5 class="font-bold mt-2">HỆ SINH THÁI</h5>
-                <ul class="text-[11px] text-slate-500 mt-3 space-y-2">
-                    <li>● Ra mắt Momas AI Bot (Beta)</li>
-                    <li>● Niêm yết trên PancakeSwap</li>
-                    <li>● Chương trình Staking nhận 18% APY</li>
-                </ul>
-            </div>
-            <div class="relative p-6 bg-white/5 rounded-2xl border-l-4 border-yellow-500">
-                <span class="text-yellow-500 font-bold text-xs">Q2 2026</span>
-                <h5 class="font-bold mt-2">MỞ RỘNG</h5>
-                <ul class="text-[11px] text-slate-500 mt-3 space-y-2">
-                    <li>● Mainnet Momas Chain</li>
-                    <li>● Hợp tác với các đối tác AI lớn</li>
-                    <li>● Listing sàn CEX Top 10</li>
-                </ul>
-            </div>
-            <div class="relative p-6 bg-white/5 rounded-2xl border-l-4 border-green-500">
-                <span class="text-green-500 font-bold text-xs">Q3 2026</span>
-                <h5 class="font-bold mt-2">THỐNG TRỊ</h5>
-                <ul class="text-[11px] text-slate-500 mt-3 space-y-2">
-                    <li>● Ra mắt Super App Momas</li>
-                    <li>● Listing Binance & Coinbase</li>
-                    <li>● Quỹ phát triển cộng đồng 5M$</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <div class="text-center">
-        <button onclick="switchTab('dashboard')" class="bg-blue-600 text-white px-12 py-4 rounded-2xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-500/20">MUA TOKEN NGAY</button>
-    </div>
-</main>
-
-<div id="fake-notify" class="fixed bottom-10 right-10 glass-card p-4 rounded-2xl border-blue-500/30 flex items-center gap-4 transition-all duration-500 translate-y-40 opacity-0 z-[100]">
-    <div class="w-10 h-10 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center">
-        <i class="fas fa-check"></i>
-    </div>
-    <div>
-        <p id="notify-text" class="text-xs font-bold text-white">Ví 0x... vừa mua 2,500 MOMAS</p>
-        <p class="text-[9px] text-slate-500">Vừa xong</p>
-    </div>
-</div>
-
-<script>
-    // Thêm đoạn này vào trong thẻ <script> của bạn để chạy thông báo giả
-    function showNotification() {
-        const addr = "0x" + Math.random().toString(16).slice(2, 6) + "..." + Math.random().toString(16).slice(2, 6);
-        const amount = (Math.floor(Math.random() * 20) + 1) * 500;
-        document.getElementById('notify-text').innerText = `Ví ${addr} vừa mua ${amount.toLocaleString()} MOMAS`;
-        
-        const el = document.getElementById('fake-notify');
-        el.classList.remove('translate-y-40', 'opacity-0');
-        
-        setTimeout(() => {
-            el.classList.add('translate-y-40', 'opacity-0');
-        }, 4000);
-    }
-
-    // Cứ mỗi 15-30 giây hiện 1 lần
-    setInterval(() => {
-        if(Math.random() > 0.5) showNotification();
-    }, 20000);
-</script>
+    <script>
         const SALE_ADDRESS = "0xd3D61008559AcdE3bb6984431E77cA2Fd648aB02";
         const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955";
         const BSC_CHAIN_ID = "0x38";
@@ -247,25 +195,25 @@
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.getElementById('tab-' + tab).classList.add('active');
             
-            // UI Active Link
-            document.getElementById('nav-dashboard').classList.remove('bg-blue-600/10', 'text-blue-500');
-            document.getElementById('nav-buy').classList.remove('bg-blue-600/10', 'text-blue-500');
+            document.getElementById('nav-dashboard').className = "w-full flex items-center gap-4 p-4 rounded-2xl transition text-slate-400 font-semibold";
+            document.getElementById('nav-buy').className = "w-full flex items-center gap-4 p-4 rounded-2xl transition text-slate-400 font-semibold";
             document.getElementById('nav-' + tab).classList.add('bg-blue-600/10', 'text-blue-500');
             
             if (window.innerWidth < 768) toggleSidebar();
         }
 
-        // Cập nhật số liệu
         function updateStats() {
             const now = new Date().getTime();
+            // Tự tăng 2M/ngày
             const daysPassed = Math.max(0, Math.floor((now - START_DATE) / (1000 * 60 * 60 * 24)));
             const currentRaise = START_USDT + (daysPassed * 2000000);
             const finalRaise = currentRaise > GOAL_USDT ? GOAL_USDT : currentRaise;
             const percent = (finalRaise / GOAL_USDT) * 100;
 
-            document.getElementById('raiseText').innerHTML = `${finalRaise.toLocaleString()} <span class='text-lg text-slate-500 font-normal'>/ ${GOAL_USDT.toLocaleString()} USDT</span>`;
+            document.getElementById('raiseText').innerHTML = `${finalRaise.toLocaleString()} <span class="text-lg text-slate-500 font-normal">/ ${GOAL_USDT.toLocaleString()} USDT</span>`;
             document.getElementById('progressBar').style.width = percent + "%";
 
+            // Đếm ngược
             const diff = END_DATE - now;
             if (diff > 0) {
                 document.getElementById('days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
@@ -282,7 +230,7 @@
                 signer = provider.getSigner();
                 updateUI(accounts[0]);
                 localStorage.setItem('connected', 'true');
-            } catch (e) {}
+            } catch (e) { console.error(e); }
         }
 
         async function updateUI(acc) {
@@ -290,12 +238,12 @@
             document.getElementById('connectBtn').innerText = acc.slice(0,6) + "..." + acc.slice(-4);
             document.getElementById('logoutBtn').classList.remove('hidden');
             
-            // QUÉT SỐ DƯ USDT THẬT TRONG VÍ
+            // QUÉT SỐ DƯ THẬT
             try {
                 const usdt = new ethers.Contract(USDT_ADDRESS, ["function balanceOf(address) view returns (uint256)"], provider);
                 const bal = await usdt.balanceOf(acc);
                 document.getElementById('userBalance').innerText = parseFloat(ethers.utils.formatUnits(bal, 18)).toFixed(2) + " USDT";
-            } catch (e) { console.error("Balance Error", e); }
+            } catch (e) { console.error(e); }
         }
 
         function calculate() {
@@ -306,14 +254,14 @@
         async function handleAction() {
             if (!signer) return connectWallet();
             const amt = document.getElementById('usdtAmount').value;
-            if (!amt || amt <= 0) return alert("Vui lòng nhập số USDT!");
+            if (!amt || amt <= 0) return alert("Nhập số tiền!");
 
             const mainBtn = document.getElementById('mainBtn');
             const amountWei = ethers.utils.parseUnits(amt, 18);
 
             try {
                 mainBtn.disabled = true;
-                mainBtn.innerHTML = "<i class='fas fa-circle-notch fa-spin'></i> Đang mã hóa giao dịch...";
+                mainBtn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> ĐANG XỬ LÝ...";
 
                 const usdt = new ethers.Contract(USDT_ADDRESS, [
                     "function allowance(address,address) view returns (uint256)", 
@@ -332,14 +280,23 @@
                 const txB = await sale.buyTokens(amountWei);
                 await txB.wait();
                 
-                alert("Mua MOMAS AI thành công!");
+                alert("Mua thành công!");
                 updateUI(user);
             } catch (e) {
-                alert("Giao dịch không thành công. Hãy thử lại!");
+                alert("Giao dịch bị từ chối hoặc lỗi mạng.");
             } finally {
                 mainBtn.disabled = false;
-                mainBtn.innerText = "CONFIRM PURCHASE";
+                mainBtn.innerText = "XÁC NHẬN MUA";
             }
+        }
+
+        function showNotification() {
+            const addr = "0x" + Math.random().toString(16).slice(2, 6) + "..." + Math.random().toString(16).slice(2, 6);
+            const amount = (Math.floor(Math.random() * 20) + 1) * 500;
+            document.getElementById('notify-text').innerText = `Ví ${addr} vừa mua ${amount.toLocaleString()} MOMAS`;
+            const el = document.getElementById('fake-notify');
+            el.classList.remove('translate-y-40', 'opacity-0');
+            setTimeout(() => el.classList.add('translate-y-40', 'opacity-0'), 4000);
         }
 
         function logout() {
@@ -350,12 +307,9 @@
         window.onload = () => {
             setInterval(updateStats, 1000);
             updateStats();
-            switchTab('dashboard');
+            setInterval(() => { if(Math.random() > 0.7) showNotification(); }, 15000);
             if (localStorage.getItem('connected') === 'true') connectWallet();
         };
     </script>
 </body>
 </html>
-
-
-
