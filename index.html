@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
         body { background-color: #050810; color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
@@ -18,7 +20,18 @@
         input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .roadmap-line { position: absolute; left: 20px; top: 0; bottom: 0; width: 2px; background: rgba(59, 130, 246, 0.2); }
+
+        /* Custom SweetAlert2 for Dark Theme */
+        .swal2-popup {
+            background: rgba(10, 15, 30, 0.95) !important;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 2rem !important;
+            color: #fff !important;
+        }
+        .swal2-title { color: #fff !important; font-style: italic; }
+        .swal2-html-container { color: #94a3b8 !important; }
+        .swal2-confirm { background: #2563eb !important; border-radius: 1rem !important; padding: 12px 30px !important; font-weight: bold !important; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -42,9 +55,9 @@
         </nav>
         
         <div class="absolute bottom-10 left-6 right-6 p-5 glass-card rounded-3xl border-blue-500/20">
-            <p class="text-[10px] text-blue-400 uppercase font-bold mb-1 tracking-widest">My Wallet Balance</p>
+            <p class="text-[10px] text-blue-400 uppercase font-bold mb-1 tracking-widest">My Balance</p>
             <p id="userBalance" class="text-lg font-bold text-white">0.0 USDT</p>
-            <div class="text-[9px] text-slate-500 mt-1 italic">Automatically updates from wallet</div>
+            <div class="text-[9px] text-slate-500 mt-1 italic">Auto-sync with wallet</div>
         </div>
     </aside>
 
@@ -67,44 +80,45 @@
 
         <main id="tab-dashboard" class="tab-content active p-6 md:p-10 max-w-6xl mx-auto">
             <div class="mb-10 text-center md:text-left">
-                <h2 class="text-4xl font-extrabold mb-2">Presale <span class="ai-gradient">MOMAS AI</span></h2>
-                <p class="text-slate-400">Own tokens of the next-generation artificial intelligence platform today!.</p>
+                <h2 class="text-4xl font-extrabold mb-2 italic">Presale <span class="ai-gradient">MOMAS AI</span></h2>
+                <p class="text-slate-400 italic font-semibold uppercase tracking-[0.2em] text-xs">Own the future of decentralized intelligence.</p>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-                <div class="glass-card rounded-[2rem] p-8">
-                    <h3 class="text-slate-400 text-xs font-bold uppercase mb-4 tracking-widest">SUCCESSFUL FUNDRAISING</h3>
-                    <div class="text-4xl font-bold mb-6 italic" id="raiseText">30,000,000 <span class="text-lg text-slate-500 font-normal">/ 85,000,000 USDT</span></div>
+                <div class="glass-card rounded-[2rem] p-8 relative overflow-hidden group">
+                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-blue-600/10 rounded-full blur-3xl group-hover:bg-blue-600/20 transition"></div>
+                    <h3 class="text-slate-400 text-xs font-bold uppercase mb-4 tracking-widest">RAISED CAPITAL</h3>
+                    <div class="text-4xl font-bold mb-6 italic" id="raiseText">30,000,000 <span class="text-lg text-slate-500 font-normal italic">/ 85,000,000 USDT</span></div>
                     <div class="w-full bg-white/5 h-4 rounded-full overflow-hidden p-1 border border-white/5">
                         <div id="progressBar" class="bg-gradient-to-r from-blue-600 to-purple-500 h-full rounded-full transition-all duration-1000" style="width: 35%"></div>
                     </div>
                 </div>
 
-                <div class="glass-card rounded-[2rem] p-8 text-center border-white/5">
-                    <h3 class="text-blue-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-6">END (31/01/2026)</h3>
+                <div class="glass-card rounded-[2rem] p-8 text-center border-white/5 flex flex-col justify-center">
+                    <h3 class="text-blue-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-6 italic">ENDS IN (JAN 31, 2026)</h3>
                     <div class="flex justify-center gap-6">
-                        <div class="flex flex-col"><span id="days" class="text-4xl font-bold mb-1">00</span><span class="text-[10px] text-slate-500 font-bold uppercase">Days</span></div>
-                        <div class="flex flex-col"><span id="hours" class="text-4xl font-bold mb-1">00</span><span class="text-[10px] text-slate-500 font-bold uppercase">Hours</span></div>
-                        <div class="flex flex-col"><span id="mins" class="text-4xl font-bold mb-1">00</span><span class="text-[10px] text-slate-500 font-bold uppercase">Mins</span></div>
+                        <div class="flex flex-col"><span id="days" class="text-4xl font-bold mb-1">00</span><span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Days</span></div>
+                        <div class="flex flex-col"><span id="hours" class="text-4xl font-bold mb-1">00</span><span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Hours</span></div>
+                        <div class="flex flex-col"><span id="mins" class="text-4xl font-bold mb-1">00</span><span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Mins</span></div>
                     </div>
                 </div>
             </div>
 
             <div class="max-w-xl mx-auto">
-                <div class="glass-card rounded-[3rem] p-10 border-t border-white/10 shadow-2xl">
+                <div class="glass-card rounded-[3rem] p-10 border-t border-white/10 shadow-2xl relative">
                     <div class="flex justify-between items-center mb-10">
-                        <h2 class="text-2xl font-bold italic tracking-tighter">BUY MOMAS</h2>
-                        <span class="text-[10px] bg-blue-500/20 text-blue-400 px-4 py-1.5 rounded-full font-bold border border-blue-500/20 uppercase tracking-widest">1 USDT = 10 MOMAS</span>
+                        <h2 class="text-2xl font-bold italic tracking-tighter uppercase">Buy MOMAS</h2>
+                        <span class="text-[10px] bg-blue-500/20 text-blue-400 px-4 py-1.5 rounded-full font-bold border border-blue-500/20 uppercase tracking-widest italic">1 USDT = 10 MOMAS</span>
                     </div>
 
                     <div class="space-y-6">
                         <div class="bg-white/5 p-6 rounded-3xl border border-white/5 focus-within:border-blue-500/50 transition">
-                            <label class="text-[10px] text-slate-500 uppercase font-bold mb-3 block">Amount of USDT deposited</label>
+                            <label class="text-[10px] text-slate-500 uppercase font-bold mb-3 block">Amount in USDT</label>
                             <input type="number" id="usdtAmount" placeholder="0.0" class="bg-transparent text-3xl font-bold w-full outline-none placeholder:text-white/10" oninput="calculate()">
                         </div>
 
                         <div class="bg-white/5 p-6 rounded-3xl border border-white/5">
-                            <label class="text-[10px] text-slate-500 uppercase font-bold mb-3 block">Estimated MOMAS receipts</label>
+                            <label class="text-[10px] text-slate-500 uppercase font-bold mb-3 block">Estimated MOMAS</label>
                             <input type="text" id="tokenReceived" readonly placeholder="0.0" class="bg-transparent text-3xl font-bold w-full outline-none text-blue-400">
                         </div>
 
@@ -118,66 +132,77 @@
 
         <main id="tab-buy" class="tab-content p-6 md:p-10 max-w-6xl mx-auto">
             <div class="text-center mb-16">
-                <h2 class="text-5xl font-extrabold mb-6">MOMAS <span class="ai-gradient">AI Ecosystem</span></h2>
-                <p class="text-slate-400 text-lg max-w-2xl mx-auto">A decentralized AI platform connects user data with global machine learning models via Smart Contracts..</p>
+                <h2 class="text-5xl font-extrabold mb-6 italic"><span class="ai-gradient">MOMAS AI</span> Ecosystem</h2>
+                <p class="text-slate-400 text-lg max-w-2xl mx-auto italic">A decentralized AI platform connecting user data via secure smart contracts.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-                <div class="glass-card p-8 rounded-3xl border-white/5 hover:bg-white/5 transition">
-                    <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-blue-500/20"><i class="fas fa-brain text-white"></i></div>
-                    <h4 class="text-xl font-bold mb-3">AI Deep Learning</h4>
-                    <p class="text-slate-400 text-sm">The system learns from DeFi transactions to optimize profits for token holders..</p>
+                <div class="glass-card p-8 rounded-3xl border-white/5 hover:border-blue-500/30 transition group">
+                    <div class="w-14 h-14 bg-blue-600/20 rounded-2xl flex items-center justify-center mb-6 text-blue-500 text-2xl group-hover:scale-110 transition">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3 italic uppercase">AI Training Hub</h4>
+                    <p class="text-slate-400 text-sm leading-relaxed italic">Earn $MOMAS rewards by contributing data to global machine learning models.</p>
                 </div>
-                <div class="glass-card p-8 rounded-3xl border-white/5 hover:bg-white/5 transition">
-                    <div class="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-purple-500/20"><i class="fas fa-shield-alt text-white"></i></div>
-                    <h4 class="text-xl font-bold mb-3">Secure Nodes</h4>
-                    <p class="text-slate-400 text-sm">Multi-layered security combined with the computing power of a decentralized node network..</p>
+                <div class="glass-card p-8 rounded-3xl border-white/5 hover:border-purple-500/30 transition group">
+                    <div class="w-14 h-14 bg-purple-600/20 rounded-2xl flex items-center justify-center mb-6 text-purple-500 text-2xl group-hover:scale-110 transition">
+                        <i class="fas fa-shield-halved"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3 italic uppercase">Secure Nodes</h4>
+                    <p class="text-slate-400 text-sm leading-relaxed italic">Run serverless AI nodes with absolute data privacy and security.</p>
                 </div>
-                <div class="glass-card p-8 rounded-3xl border-white/5 hover:bg-white/5 transition">
-                    <div class="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-green-500/20"><i class="fas fa-database text-white"></i></div>
-                    <h4 class="text-xl font-bold mb-3">Data Monetization</h4>
-                    <p class="text-slate-400 text-sm">Users can earn passive income by contributing data to AI models.</p>
+                <div class="glass-card p-8 rounded-3xl border-white/5 hover:border-green-500/30 transition group">
+                    <div class="w-14 h-14 bg-green-600/20 rounded-2xl flex items-center justify-center mb-6 text-green-500 text-2xl group-hover:scale-110 transition">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3 italic uppercase">Launchpad</h4>
+                    <p class="text-slate-400 text-sm leading-relaxed italic">The incubator for the most innovative AI projects on Momas Chain.</p>
                 </div>
             </div>
 
             <div class="mb-20">
-                <h3 class="text-3xl font-bold text-center mb-12 italic uppercase"> Roadmap </h3>
+                <h3 class="text-3xl font-bold text-center mb-12 italic uppercase tracking-widest">Roadmap 2025 - 2026</h3>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div class="glass-card p-6 rounded-2xl border-l-4 border-blue-500">
-                        <span class="text-blue-500 font-bold text-xs">Q4 2025</span>
-                        <h5 class="font-bold mt-2">Launch</h5>
-                        <p class="text-[11px] text-slate-500 mt-2 italic">Smart Contract Release & Presale Launch Phase 1.</p>
+                    <div class="p-6 glass-card rounded-2xl border-l-4 border-blue-500 shadow-xl">
+                        <span class="text-blue-500 font-bold text-xs uppercase italic">Phase 1</span>
+                        <h5 class="font-bold mt-2 italic uppercase">Presale Launch</h5>
+                        <p class="text-[11px] text-slate-500 mt-3 italic">Token sale Phase 1. Smart Contract Audit by Certik.</p>
                     </div>
-                    <div class="glass-card p-6 rounded-2xl border-l-4 border-purple-500">
-                        <span class="text-purple-500 font-bold text-xs">Q1 2026</span>
-                        <h5 class="font-bold mt-2">Listing</h5>
-                        <p class="text-[11px] text-slate-500 mt-2 italic">Listing PancakeSwap and major CEX exchanges. Launching Staking..</p>
+                    <div class="p-6 glass-card rounded-2xl border-l-4 border-purple-500 shadow-xl">
+                        <span class="text-purple-500 font-bold text-xs uppercase italic">Phase 2</span>
+                        <h5 class="font-bold mt-2 italic uppercase">CEX Listing</h5>
+                        <p class="text-[11px] text-slate-500 mt-3 italic">Listing on PancakeSwap and top-tier exchanges.</p>
                     </div>
-                    <div class="glass-card p-6 rounded-2xl border-l-4 border-yellow-500">
-                        <span class="text-yellow-500 font-bold text-xs">Q2 2026</span>
-                        <h5 class="font-bold mt-2">Extend</h5>
-                        <p class="text-[11px] text-slate-500 mt-2 italic">Mainnet Momas AI Chain & AI Technology Partnerships.</p>
+                    <div class="p-6 glass-card rounded-2xl border-l-4 border-yellow-500 shadow-xl">
+                        <span class="text-yellow-500 font-bold text-xs uppercase italic">Phase 3</span>
+                        <h5 class="font-bold mt-2 italic uppercase">AI Mainnet</h5>
+                        <p class="text-[11px] text-slate-500 mt-3 italic">Mainnet Momas AI Chain deployment. Staking dApp.</p>
                     </div>
-                    <div class="glass-card p-6 rounded-2xl border-l-4 border-green-500">
-                        <span class="text-green-500 font-bold text-xs">Q3 2026</span>
-                        <h5 class="font-bold mt-2">Dominate</h5>
-                        <p class="text-[11px] text-slate-500 mt-2 italic">Launching the Momos Super App & Listing on Binance globally..</p>
+                    <div class="p-6 glass-card rounded-2xl border-l-4 border-green-500 shadow-xl">
+                        <span class="text-green-500 font-bold text-xs uppercase italic">Phase 4</span>
+                        <h5 class="font-bold mt-2 italic uppercase">Super App</h5>
+                        <p class="text-[11px] text-slate-500 mt-3 italic">Official Super App release. Listing on Binance Global.</p>
                     </div>
                 </div>
             </div>
 
             <div class="text-center">
-                <button onclick="switchTab('dashboard')" class="bg-blue-600 px-10 py-4 rounded-2xl font-bold shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition">BUY TOKEN NOW</button>
+                <button onclick="switchTab('dashboard')" class="bg-blue-600 px-12 py-5 rounded-2xl font-bold text-xl glow-btn transition uppercase italic tracking-widest">Join Presale Now</button>
             </div>
         </main>
     </div>
 
-    
+    <div id="fake-notify" class="fixed bottom-10 right-10 glass-card p-4 rounded-2xl border-blue-500/30 flex items-center gap-4 transition-all duration-500 translate-y-40 opacity-0 z-[100]">
+        <div class="w-10 h-10 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center"><i class="fas fa-check"></i></div>
+        <div>
+            <p id="notify-text" class="text-xs font-bold text-white italic">Wallet 0x... just bought 2,500 MOMAS</p>
+            <p class="text-[9px] text-slate-500 uppercase font-bold tracking-widest">Confirmed</p>
+        </div>
+    </div>
 
     <script>
         const SALE_ADDRESS = "0xd3D61008559AcdE3bb6984431E77cA2Fd648aB02";
         const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955";
-        const BSC_CHAIN_ID = "0x38";
         
         const GOAL_USDT = 85000000;
         const START_USDT = 30000000;
@@ -186,51 +211,59 @@
 
         let provider, signer;
 
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('sidebar-active');
-            document.getElementById('overlay').classList.toggle('hidden');
-        }
-
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.getElementById('tab-' + tab).classList.add('active');
-            
-            document.getElementById('nav-dashboard').className = "w-full flex items-center gap-4 p-4 rounded-2xl transition text-slate-400 font-semibold";
-            document.getElementById('nav-buy').className = "w-full flex items-center gap-4 p-4 rounded-2xl transition text-slate-400 font-semibold";
-            document.getElementById('nav-' + tab).classList.add('bg-blue-600/10', 'text-blue-500');
-            
-            if (window.innerWidth < 768) toggleSidebar();
-        }
-
-        function updateStats() {
-            const now = new Date().getTime();
-            // Tự tăng 2M/ngày
-            const daysPassed = Math.max(0, Math.floor((now - START_DATE) / (1000 * 60 * 60 * 24)));
-            const currentRaise = START_USDT + (daysPassed * 2000000);
-            const finalRaise = currentRaise > GOAL_USDT ? GOAL_USDT : currentRaise;
-            const percent = (finalRaise / GOAL_USDT) * 100;
-
-            document.getElementById('raiseText').innerHTML = `${finalRaise.toLocaleString()} <span class="text-lg text-slate-500 font-normal">/ ${GOAL_USDT.toLocaleString()} USDT</span>`;
-            document.getElementById('progressBar').style.width = percent + "%";
-
-            // Đếm ngược
-            const diff = END_DATE - now;
-            if (diff > 0) {
-                document.getElementById('days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
-                document.getElementById('hours').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
-                document.getElementById('mins').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
-            }
+        function showBox(title, text, icon = 'info') {
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: icon,
+                background: '#0a0f1e',
+                color: '#fff',
+                confirmButtonColor: '#2563eb',
+                confirmButtonText: 'Got it'
+            });
         }
 
         async function connectWallet() {
-            if (!window.ethereum) return alert("Vui lòng cài đặt ví Web3!");
-            try {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                signer = provider.getSigner();
-                updateUI(accounts[0]);
-                localStorage.setItem('connected', 'true');
-            } catch (e) { console.error(e); }
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    signer = provider.getSigner();
+                    updateUI(accounts[0]);
+                    localStorage.setItem('connected', 'true');
+                    
+                    Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    }).fire({ icon: 'success', title: 'Wallet Connected!' });
+
+                } catch (e) {
+                    showBox('Canceled', 'Connection request denied.', 'error');
+                }
+            } else {
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                if (isMobile) {
+                    Swal.fire({
+                        title: 'Wallet Not Found!',
+                        html: `No Web3 wallet detected. Choose a wallet to open:<br><br>
+                               <div class="flex flex-col gap-3">
+                                 <a href="https://metamask.app.link/dapp/${window.location.host}" class="bg-blue-600 p-4 rounded-2xl font-bold text-white flex items-center justify-center gap-2">
+                                    <i class="fas fa-download"></i> Open in MetaMask
+                                 </a>
+                                 <a href="https://link.trustwallet.com/open_url?url=${window.location.href}" class="bg-slate-800 p-4 rounded-2xl font-bold text-white flex items-center justify-center gap-2">
+                                    <i class="fas fa-wallet"></i> Open in Trust Wallet
+                                 </a>
+                               </div>`,
+                        showConfirmButton: false,
+                        background: '#0a0f1e',
+                        color: '#fff'
+                    });
+                } else {
+                    showBox('Notice', 'Please install MetaMask extension to continue.', 'warning');
+                }
+            }
         }
 
         async function updateUI(acc) {
@@ -238,7 +271,6 @@
             document.getElementById('connectBtn').innerText = acc.slice(0,6) + "..." + acc.slice(-4);
             document.getElementById('logoutBtn').classList.remove('hidden');
             
-            // QUÉT SỐ DƯ THẬT
             try {
                 const usdt = new ethers.Contract(USDT_ADDRESS, ["function balanceOf(address) view returns (uint256)"], provider);
                 const bal = await usdt.balanceOf(acc);
@@ -254,14 +286,14 @@
         async function handleAction() {
             if (!signer) return connectWallet();
             const amt = document.getElementById('usdtAmount').value;
-            if (!amt || amt <= 0) return alert("Nhập số tiền!");
+            if (!amt || amt <= 0) return showBox('Error', 'Please enter a valid USDT amount!', 'error');
 
             const mainBtn = document.getElementById('mainBtn');
             const amountWei = ethers.utils.parseUnits(amt, 18);
 
             try {
                 mainBtn.disabled = true;
-                mainBtn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> ĐANG XỬ LÝ...";
+                mainBtn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> PROCESSING...";
 
                 const usdt = new ethers.Contract(USDT_ADDRESS, [
                     "function allowance(address,address) view returns (uint256)", 
@@ -272,37 +304,63 @@
                 const allowance = await usdt.allowance(user, SALE_ADDRESS);
 
                 if (allowance.lt(amountWei)) {
+                    Swal.fire({ title: 'Step 1/2', text: 'Please approve USDT usage in your wallet.', icon: 'info', showConfirmButton: false });
                     const txA = await usdt.approve(SALE_ADDRESS, ethers.constants.MaxUint256);
                     await txA.wait();
+                    Swal.close();
                 }
 
+                Swal.fire({ title: 'Step 2/2', text: 'Please confirm your MOMAS purchase.', icon: 'info', showConfirmButton: false });
                 const sale = new ethers.Contract(SALE_ADDRESS, ["function buyTokens(uint256) public"], signer);
                 const txB = await sale.buyTokens(amountWei);
                 await txB.wait();
                 
-                alert("Mua thành công!");
+                Swal.fire({ title: 'Success!', text: 'Transaction complete. Welcome to Momas AI!', icon: 'success' });
                 updateUI(user);
             } catch (e) {
-                alert("Giao dịch bị từ chối hoặc lỗi mạng.");
+                showBox('Failed', 'Transaction rejected or insufficient balance.', 'error');
             } finally {
                 mainBtn.disabled = false;
-                mainBtn.innerText = "XÁC NHẬN MUA";
+                mainBtn.innerText = "CONFIRM PURCHASE";
+            }
+        }
+
+        function updateStats() {
+            const now = new Date().getTime();
+            const daysPassed = Math.max(0, Math.floor((now - START_DATE) / (1000 * 60 * 60 * 24)));
+            const currentRaise = START_USDT + (daysPassed * 2000000);
+            const finalRaise = Math.min(currentRaise, GOAL_USDT);
+            
+            document.getElementById('raiseText').innerHTML = `${finalRaise.toLocaleString()} <span class="text-lg text-slate-500 font-normal italic">/ ${GOAL_USDT.toLocaleString()} USDT</span>`;
+            document.getElementById('progressBar').style.width = (finalRaise/GOAL_USDT*100) + "%";
+
+            const diff = END_DATE - now;
+            if (diff > 0) {
+                document.getElementById('days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
+                document.getElementById('hours').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
+                document.getElementById('mins').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
             }
         }
 
         function showNotification() {
             const addr = "0x" + Math.random().toString(16).slice(2, 6) + "..." + Math.random().toString(16).slice(2, 6);
             const amount = (Math.floor(Math.random() * 20) + 1) * 500;
-            document.getElementById('notify-text').innerText = `Ví ${addr} vừa mua ${amount.toLocaleString()} MOMAS`;
+            document.getElementById('notify-text').innerText = `Wallet ${addr} just bought ${amount.toLocaleString()} MOMAS`;
             const el = document.getElementById('fake-notify');
             el.classList.remove('translate-y-40', 'opacity-0');
             setTimeout(() => el.classList.add('translate-y-40', 'opacity-0'), 4000);
         }
 
-        function logout() {
-            localStorage.setItem('connected', 'false');
-            window.location.reload();
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('sidebar-active'); document.getElementById('overlay').classList.toggle('hidden'); }
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            document.getElementById('nav-dashboard').className = "w-full flex items-center gap-4 p-4 rounded-2xl transition text-slate-400 font-semibold";
+            document.getElementById('nav-buy').className = "w-full flex items-center gap-4 p-4 rounded-2xl transition text-slate-400 font-semibold";
+            document.getElementById('nav-' + tab).classList.add('bg-blue-600/10', 'text-blue-500');
+            if (window.innerWidth < 768) toggleSidebar();
         }
+        function logout() { localStorage.setItem('connected', 'false'); window.location.reload(); }
 
         window.onload = () => {
             setInterval(updateStats, 1000);
@@ -313,4 +371,3 @@
     </script>
 </body>
 </html>
-
