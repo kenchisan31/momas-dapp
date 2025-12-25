@@ -222,49 +222,53 @@
                 confirmButtonText: 'Got it'
             });
         }
+async function connectWallet() {
+    if (typeof window.ethereum !== 'undefined') {
+        try {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+            signer = provider.getSigner();
+            updateUI(accounts[0]);
+            localStorage.setItem('connected', 'true');
+            
+            Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            }).fire({ icon: 'success', title: 'Wallet Connected!' });
 
-        async function connectWallet() {
-            if (typeof window.ethereum !== 'undefined') {
-                try {
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    provider = new ethers.providers.Web3Provider(window.ethereum);
-                    signer = provider.getSigner();
-                    updateUI(accounts[0]);
-                    localStorage.setItem('connected', 'true');
-                    
-                    Swal.mixin({
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000
-                    }).fire({ icon: 'success', title: 'Wallet Connected!' });
-
-                } catch (e) {
-                    showBox('Canceled', 'Connection request denied.', 'error');
-                }
-            } else {
-                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                if (isMobile) {
-                    Swal.fire({
-                        title: 'Wallet Not Found!',
-                        html: `No Web3 wallet detected. Choose a wallet to open:<br><br>
-                               <div class="flex flex-col gap-3">
-                                 <a href="https://metamask.app.link/dapp/${window.location.host}" class="bg-blue-600 p-4 rounded-2xl font-bold text-white flex items-center justify-center gap-2">
-                                    <i class="fas fa-download"></i> Open in MetaMask
-                                 </a>
-                                 <a href="https://link.trustwallet.com/open_url?url=${window.location.href}" class="bg-slate-800 p-4 rounded-2xl font-bold text-white flex items-center justify-center gap-2">
-                                    <i class="fas fa-wallet"></i> Open in Trust Wallet
-                                 </a>
-                               </div>`,
-                        showConfirmButton: false,
-                        background: '#0a0f1e',
-                        color: '#fff'
-                    });
-                } else {
-                    showBox('Notice', 'Please install MetaMask extension to continue.', 'warning');
-                }
-            }
+        } catch (e) {
+            showBox('Canceled', 'Connection request denied.', 'error');
         }
+    } else {
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        if (isMobile) {
+            // Lấy domain hiện tại để dán vào link mở ví
+            const currentUrl = window.location.href.replace(/^https?:\/\//, ''); 
+            
+            Swal.fire({
+                title: 'Wallet Not Found!',
+                html: `No Web3 wallet detected. Choose a wallet to open directly:<br><br>
+                       <div class="flex flex-col gap-3">
+                         <a href="https://metamask.app.link/dapp/${currentUrl}" class="bg-[#f6851b] p-4 rounded-2xl font-bold text-white flex items-center justify-center gap-3 hover:scale-105 transition">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Logo.svg" class="w-6 h-6"> Open in MetaMask
+                         </a>
+                         
+                         <a href="https://link.trustwallet.com/open_url?url=${window.location.href}" class="bg-[#3375bb] p-4 rounded-2xl font-bold text-white flex items-center justify-center gap-3 hover:scale-105 transition">
+                            <img src="https://trustwallet.com/assets/images/media/assets/trust_platform_light.svg" class="w-6 h-6"> Open in Trust Wallet
+                         </a>
+                       </div>
+                       <p class="text-[10px] text-slate-500 mt-4 italic">* This will open the dApp inside your wallet's secure browser.</p>`,
+                showConfirmButton: false,
+                background: '#0a0f1e',
+                color: '#fff'
+            });
+        } else {
+            showBox('Notice', 'Please install MetaMask extension to continue.', 'warning');
+        }
+    }
+}
 
         async function updateUI(acc) {
             if (!acc) return;
@@ -371,3 +375,4 @@
     </script>
 </body>
 </html>
+
