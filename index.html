@@ -223,52 +223,64 @@
             });
         }
 async function connectWallet() {
-    if (typeof window.ethereum !== 'undefined') {
-        try {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            provider = new ethers.providers.Web3Provider(window.ethereum);
-            signer = provider.getSigner();
-            updateUI(accounts[0]);
-            localStorage.setItem('connected', 'true');
-            
-            Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000
-            }).fire({ icon: 'success', title: 'Wallet Connected!' });
+            // Kiểm tra nếu trình duyệt có hỗ trợ ví (Extension hoặc dApp Browser)
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    signer = provider.getSigner();
+                    updateUI(accounts[0]);
+                    localStorage.setItem('connected', 'true');
+                    
+                    Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    }).fire({ icon: 'success', title: 'Wallet Connected!' });
 
-        } catch (e) {
-            showBox('Canceled', 'Connection request denied.', 'error');
+                } catch (e) {
+                    showBox('Canceled', 'Connection request denied.', 'error');
+                }
+            } else {
+                // XỬ LÝ KHI KHÔNG CÓ VÍ (ĐẶC BIỆT TRÊN MOBILE)
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                if (isMobile) {
+                    // Lấy URL hiện tại để Deep Link mở đúng trang web bên trong ví
+                    const currentUrl = window.location.href.replace(/^https?:\/\//, ''); 
+                    
+                    Swal.fire({
+                        title: 'Wallet Not Found!',
+                        html: `No Web3 wallet detected. Choose a wallet to open directly:<br><br>
+                               <div class="flex flex-col gap-3">
+                                 <a href="https://metamask.app.link/dapp/${currentUrl}" class="bg-[#f6851b] p-4 rounded-2xl font-bold text-white flex items-center justify-center gap-3 hover:scale-105 transition shadow-lg shadow-orange-500/20">
+                                    <svg width="24" height="24" viewBox="0 0 256 256">
+                                        <path d="M252.06 123.01l-14.77-51.54L208.5 25.85l-19.14 38.63L99.71 47.9l4.58 35.84-60.89 12.35L11.53 148.2l38.82 24.36 1.83 57.59 40.4-33.09 72.82 33.09 40.39-33.09 1.83-57.59 44.44-26.46z" fill="#E2761B"/>
+                                        <path d="M128 198.83l-72.82-33.09 13.96-10.43 58.86 17.51 58.86-17.51 13.96 10.43-72.82 33.09z" fill="#E4761B"/>
+                                        <path d="M167.73 128.8l-14.53-30.8-25.2 7.51 25.2 7.51 14.53 15.78z" fill="#D7C1B3"/>
+                                        <path d="M88.27 128.8l14.53-30.8 25.2 7.51-25.2 7.51-14.53 15.78z" fill="#D7C1B3"/>
+                                    </svg>
+                                    Open in MetaMask
+                                 </a>
+                                 
+                                 <a href="https://link.trustwallet.com/open_url?url=${window.location.href}" class="bg-[#3375bb] p-4 rounded-2xl font-bold text-white flex items-center justify-center gap-3 hover:scale-105 transition shadow-lg shadow-blue-500/20">
+                                    <svg width="24" height="24" viewBox="0 0 1024 1024">
+                                        <path d="M512 0C229.23 0 0 229.23 0 512s229.23 512 512 512 512-229.23 512-512S794.77 0 512 0zm254.15 572.68c-10.87 141.6-114.77 241.13-254.15 241.13S263.22 714.28 252.35 572.68V264.44l259.65-54.26 254.15 54.26v308.24z" fill="#fff"/>
+                                    </svg>
+                                    Open in Trust Wallet
+                                 </a>
+                               </div>
+                               <p class="text-[10px] text-slate-500 mt-4 italic">* On Mobile: These links will open the App and redirect to this site automatically.</p>`,
+                        showConfirmButton: false,
+                        background: '#0a0f1e',
+                        color: '#fff'
+                    });
+                } else {
+                    // Trên Laptop/PC
+                    showBox('Notice', 'Please install MetaMask extension on your browser to continue.', 'warning');
+                }
+            }
         }
-    } else {
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        if (isMobile) {
-            // Lấy domain hiện tại để dán vào link mở ví
-            const currentUrl = window.location.href.replace(/^https?:\/\//, ''); 
-            
-            Swal.fire({
-                title: 'Wallet Not Found!',
-                html: `No Web3 wallet detected. Choose a wallet to open directly:<br><br>
-                       <div class="flex flex-col gap-3">
-                         <a href="https://metamask.app.link/dapp/${currentUrl}" class="bg-[#f6851b] p-4 rounded-2xl font-bold text-white flex items-center justify-center gap-3 hover:scale-105 transition">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Logo.svg" class="w-6 h-6"> Open in MetaMask
-                         </a>
-                         
-                         <a href="https://link.trustwallet.com/open_url?url=${window.location.href}" class="bg-[#3375bb] p-4 rounded-2xl font-bold text-white flex items-center justify-center gap-3 hover:scale-105 transition">
-                            <img src="https://trustwallet.com/assets/images/media/assets/trust_platform_light.svg" class="w-6 h-6"> Open in Trust Wallet
-                         </a>
-                       </div>
-                       <p class="text-[10px] text-slate-500 mt-4 italic">* This will open the dApp inside your wallet's secure browser.</p>`,
-                showConfirmButton: false,
-                background: '#0a0f1e',
-                color: '#fff'
-            });
-        } else {
-            showBox('Notice', 'Please install MetaMask extension to continue.', 'warning');
-        }
-    }
-}
 
         async function updateUI(acc) {
             if (!acc) return;
@@ -375,4 +387,5 @@ async function connectWallet() {
     </script>
 </body>
 </html>
+
 
