@@ -1,230 +1,268 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Momas Network | Staking Dashboard</title>
+    <title>Momas Network | Staking</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #fafafa; /* Nền sáng đồng nhất */
-            color: #111;
-        }
-
-        /* Sidebar liền mạch với nền */
-        .sidebar {
-            width: 280px;
-            height: 100vh;
-            position: fixed;
-            left: 0; top: 0;
-            background: #fff;
-            border-right: 1px solid #f0f0f0;
-            z-index: 50;
-        }
-
-        .main-content {
-            margin-left: 280px;
+            font-family: 'Inter', sans-serif;
+            background-color: #0f011a; 
+            color: #d1d5db;
+            margin: 0;
             min-height: 100vh;
             display: flex;
-            flex-col;
+            flex-direction: column;
         }
-
-        /* Card kiểu Bless: Không viền đen, chỉ đổ bóng nhẹ */
-        .glass-card {
-            background: #ffffff;
+        /* Hiệu ứng nền mờ ảo */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 0%, #2e084d 0%, rgba(15, 1, 26, 0) 70%);
+            z-index: -1;
+        }
+        .stake-card-bg {
+            background-color: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 24px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-            border: 1px solid #f3f4f6;
         }
-
-        /* Nút bấm chuyển mạng chuyên nghiệp */
-        .btn-action {
-            background: #000;
-            color: #fff;
-            transition: all 0.2s ease;
-        }
-        .btn-action:hover { transform: translateY(-1px); opacity: 0.9; }
-
-        /* Vùng thông báo ẩn hiện dưới Button */
-        #statusMessage {
-            display: none;
-            margin-top: 16px;
-            padding: 12px;
+        /* Countdown Style */
+        .countdown-segment {
+            background: rgba(255, 255, 255, 0.05);
+            color: #f0b90b; /* Binance Yellow */
+            font-weight: 700;
+            font-size: 1.25rem;
+            padding: 10px;
             border-radius: 12px;
-            font-size: 13px;
-            font-weight: 600;
+            min-width: 55px;
             text-align: center;
+            border: 1px solid rgba(240, 185, 11, 0.2);
         }
-
-        @media (max-width: 1024px) {
-            .sidebar { display: none; }
-            .main-content { margin-left: 0; width: 100%; }
+        /* Tinh chỉnh Social Icon gọn gàng */
+        .social-icon {
+            font-size: 1.2rem;
+            color: #6b7280;
+            transition: all 0.3s ease;
+            padding: 10px;
         }
+        .social-icon:hover {
+            color: #fff;
+            transform: translateY(-2px);
+        }
+        /* Sponsor logos gọn gàng */
+        .sponsor-logo {
+            height: 25px;
+            filter: grayscale(1) opacity(0.4);
+            transition: all 0.5s ease;
+        }
+        .sponsor-logo:hover {
+            filter: grayscale(0) opacity(1);
+        }
+        /* Notification Box */
+        .notification-box {
+            display: none;
+            position: fixed;
+            top: 20px; right: 20px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            z-index: 9999;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
     </style>
 </head>
-<body class="flex">
+<body>
 
-    <aside class="sidebar flex flex-col p-8 justify-between">
-        <div>
-            <div class="flex items-center gap-3 mb-12">
-                <div class="w-10 h-10 bg-black rounded-xl flex items-center justify-center shadow-lg shadow-black/10">
-                    <i class="fas fa-layer-group text-white"></i>
-                </div>
-                <span class="font-extrabold text-xl tracking-tighter">MOMAS</span>
+    <nav class="w-full py-5 px-8 flex justify-between items-center border-b border-white/5 bg-black/20 backdrop-blur-md sticky top-0 z-50">
+        <div class="flex items-center gap-8">
+            <a href="#" class="text-white font-black text-xl tracking-tighter">MOMAS</a>
+            <div class="hidden md:flex gap-6 text-sm font-semibold text-gray-400">
+                <a href="#" class="text-white">Stake</a>
+                <a href="#" class="hover:text-white transition">Referral</a>
+                <a href="#" class="hover:text-white transition">Docs</a>
             </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div id="networkStatus" class="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-red-500/50 text-red-500">Wrong Network</div>
+            <button id="connectButton" onclick="connectWallet()" class="bg-white text-black px-6 py-2 rounded-full text-sm font-bold hover:bg-gray-200 transition">Connect Wallet</button>
+        </div>
+    </nav>
+
+    <main class="flex-grow flex flex-col items-center justify-center p-6">
+        <div class="w-full max-w-lg">
             
-            <nav class="space-y-2">
-                <a href="#" class="flex items-center gap-4 px-4 py-3 text-gray-400 hover:text-black transition font-semibold"><i class="fas fa-home w-5"></i> Dashboard</a>
-                <a href="#" class="flex items-center gap-4 px-4 py-3 bg-gray-50 text-black rounded-xl font-bold"><i class="fas fa-percentage w-5"></i> Staking</a>
-                <a href="#" class="flex items-center gap-4 px-4 py-3 text-gray-400 hover:text-black transition font-semibold"><i class="fas fa-users w-5"></i> Referral</a>
-            </nav>
-        </div>
-
-        <div class="border-t pt-6">
-            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 px-4">Community</p>
-            <div class="flex gap-2 px-2">
-                <a href="#" class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 transition text-gray-500"><i class="fab fa-twitter"></i></a>
-                <a href="#" class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 transition text-gray-500"><i class="fab fa-telegram"></i></a>
-                <a href="#" class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 transition text-gray-500"><i class="fas fa-book"></i></a>
-            </div>
-        </div>
-    </aside>
-
-    <div class="main-content w-full">
-        <header class="h-20 flex items-center justify-between px-10 bg-white/50 backdrop-blur-sm sticky top-0 z-40">
-            <span class="text-sm font-bold text-gray-400">Staking <span class="mx-2 text-gray-200">/</span> <span class="text-black">Stake Bless</span></span>
-            <button id="connectButton" onclick="connectWallet()" class="bg-white border border-gray-200 px-6 py-2 rounded-full text-sm font-bold shadow-sm hover:bg-gray-50 transition-all">
-                Connect Wallet
-            </button>
-        </header>
-
-        <main class="flex-grow p-10 flex flex-col items-center">
-            <div class="w-full max-w-xl">
-                <div class="glass-card p-10 relative overflow-hidden mb-12">
-                    <div class="flex justify-between items-center mb-10">
-                        <div class="flex items-center gap-4">
-                            <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center border border-gray-100"><i class="fas fa-gem text-2xl"></i></div>
-                            <div>
-                                <h3 class="font-bold text-lg leading-tight">BLESS</h3>
-                                <p class="text-[10px] font-bold text-green-500 uppercase tracking-widest">● Live Now</p>
-                            </div>
+            <div class="stake-card-bg p-8 mb-12 shadow-2xl">
+                <h2 class="text-2xl font-bold text-white mb-8">Stake USDT to Momas</h2>
+                
+                <div class="space-y-6">
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-500 uppercase mb-2">Input Amount</p>
+                            <input type="number" id="usdtAmount" oninput="calculateMomas()" class="bg-transparent text-3xl font-bold text-white outline-none w-full" placeholder="0.0">
                         </div>
                         <div class="text-right">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase">My Momas</p>
-                            <p class="text-2xl font-black" id="momasAmount">0.00</p>
+                            <p class="text-[10px] font-bold text-gray-500 uppercase mb-1">USDT Balance</p>
+                            <p class="font-bold text-white" id="usdtBalance">0.00</p>
                         </div>
                     </div>
 
-                    <div class="space-y-6">
-                        <div class="relative">
-                            <div class="flex justify-between mb-2 px-1">
-                                <span class="text-[11px] font-bold text-gray-400 uppercase">Amount USDT</span>
-                                <span class="text-xs font-bold">Balance: <span id="usdtBalance" class="text-black">0.00</span></span>
-                            </div>
-                            <input type="number" id="usdtAmount" oninput="calculateMomas()" class="w-full bg-gray-50 border-none rounded-2xl px-6 py-5 text-2xl font-black outline-none transition-all focus:ring-2 ring-gray-100" placeholder="0.00">
-                            <button onclick="setMax()" class="absolute right-4 bottom-4 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-bold shadow-sm">MAX</button>
+                    <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-400">You will receive</span>
+                            <span class="text-white font-bold" id="momasAmount">0.0 MOMAS</span>
                         </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="p-4 bg-gray-50/50 rounded-2xl border border-gray-100 text-center">
-                                <p class="text-[9px] font-bold text-gray-400 uppercase mb-1">Current APY</p>
-                                <p class="font-black text-green-600">~ 18.5%</p>
-                            </div>
-                            <div class="p-4 bg-gray-50/50 rounded-2xl border border-gray-100 text-center">
-                                <p class="text-[9px] font-bold text-gray-400 uppercase mb-1">You Receive</p>
-                                <p class="font-black" id="estMomas">0.00 MOMAS</p>
-                            </div>
-                        </div>
-
-                        <button id="mainButton" onclick="handleBlockchainAction()" class="btn-action w-full py-5 rounded-2xl font-bold text-lg shadow-xl shadow-black/5 active:scale-95">
-                            Approve & Stake
-                        </button>
-
-                        <div id="statusMessage"></div>
                     </div>
-                </div>
 
-                <div class="w-full">
-                    <p class="text-center text-[10px] font-bold text-gray-300 uppercase tracking-[0.3em] mb-8">Backed by Industry Leaders</p>
-                    <div class="flex flex-wrap justify-center items-center gap-x-12 gap-y-8 opacity-30 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e8/Binance_Logo.svg" class="h-6" alt="Binance">
-                        <img src="https://cryptologos.cc/logos/solana-sol-logo.svg" class="h-6" alt="Solana">
-                        <img src="https://cryptologos.cc/logos/polygon-matic-logo.svg" class="h-6" alt="Polygon">
-                        <img src="https://placehold.co/100x20/000/fff?text=COINBASE" class="h-5" alt="Coinbase">
+                    <button id="approveButton" onclick="handleBuyAction()" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-purple-900/20 transition-all">
+                        Approve & Buy Momas
+                    </button>
+
+                    <div class="mt-8 pt-6 border-t border-white/5">
+                        <p class="text-center text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">Pre-sale ends in</p>
+                        <div id="countdownTimer" class="flex justify-center gap-3">
+                            <div class="flex flex-col items-center"><span id="days" class="countdown-segment">00</span><span class="text-[9px] mt-1 text-gray-500 uppercase">Days</span></div>
+                            <div class="flex flex-col items-center"><span id="hours" class="countdown-segment">00</span><span class="text-[9px] mt-1 text-gray-500 uppercase">Hours</span></div>
+                            <div class="flex flex-col items-center"><span id="minutes" class="countdown-segment">00</span><span class="text-[9px] mt-1 text-gray-500 uppercase">Mins</span></div>
+                            <div class="flex flex-col items-center"><span id="seconds" class="countdown-segment">00</span><span class="text-[9px] mt-1 text-gray-500 uppercase">Secs</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </main>
+
+            <div class="text-center">
+                <p class="text-[9px] font-bold text-gray-600 uppercase tracking-[0.3em] mb-6">Main Sponsors & Partners</p>
+                <div class="flex justify-center items-center gap-10">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/e8/Binance_Logo.svg" class="sponsor-logo" alt="Binance">
+                    <img src="https://cryptologos.cc/logos/solana-sol-logo.svg" class="sponsor-logo" alt="Solana">
+                    <img src="https://cryptologos.cc/logos/polygon-matic-logo.svg" class="sponsor-logo" alt="Polygon">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-10 border-t border-white/5 flex flex-col items-center">
+        <div class="flex gap-4 mb-4">
+            <a href="#" class="social-icon"><i class="fab fa-telegram-plane"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-discord"></i></a>
+            <a href="#" class="social-icon"><i class="fas fa-book"></i></a>
+        </div>
+        <p class="text-[10px] text-gray-600">© 2025 Momas Network. All Rights Reserved.</p>
+    </footer>
+
+    <div id="notificationBox" class="notification-box bg-white text-black">
+        <p id="notificationMessage" class="text-sm font-bold"></p>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <script>
-        /* TÔI GIỮ CÁC TÊN BIẾN VÀ ID CŨ ĐỂ BẠN DÁN CODE CŨ VÀO MÀ KHÔNG LỖI:
-           - usdtAmount (ID Input)
-           - usdtBalance (ID số dư)
-           - momasAmount (ID số dư Momas)
-           - connectButton (ID nút kết nối)
-        */
-
         let web3;
         let userAccount;
+        let isNetworkValid = false;
+        const contractAddress = '0xd3D61008559AcdE3bb6984431E77cA2Fd648aB02';
+        const usdtContractAddress = '0x55d398326f99059fF775485246999027B3197955';
 
-        // Hàm hiện thông báo đẹp (Thay cho alert)
-        function showNotify(text, isError = false) {
-            const el = document.getElementById('statusMessage');
-            el.innerText = text;
-            el.style.display = 'block';
-            el.style.backgroundColor = isError ? '#fef2f2' : '#f0fdf4';
-            el.style.color = isError ? '#dc2626' : '#16a34a';
-            el.style.border = `1px solid ${isError ? '#fee2e2' : '#dcfce7'}`;
-        }
+        // ABI rút gọn
+        const usdtABI = [
+            {"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"},
+            {"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"type":"function"},
+            {"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"","type":"uint256"}],"type":"function"}
+        ];
+        const presaleABI = [
+            {"inputs":[{"internalType":"uint256","name":"usdtAmount","type":"uint256"}],"name":"buyTokens","outputs":[],"stateMutability":"nonpayable","type":"function"}
+        ];
 
-        // Logic xử lý khi nhấn nút Stake (Bạn dán code gửi giao dịch của bạn vào đây)
-        async function handleBlockchainAction() {
-            if (!userAccount) {
-                await connectWallet();
-                return;
-            }
-
-            // GỌI VÍ: Đây là nơi bạn dán code: await contract.methods.approve(...).send(...)
-            showNotify("Đang yêu cầu xác nhận từ ví...");
-            
-            try {
-                // Ví dụ logic bật ví:
-                // await web3.eth.sendTransaction({...});
-                // showNotify("Giao dịch thành công!");
-            } catch (e) {
-                showNotify("Giao dịch bị từ chối.", true);
-            }
+        function showNotify(msg, type='info') {
+            const box = document.getElementById('notificationBox');
+            document.getElementById('notificationMessage').innerText = msg;
+            box.style.display = 'block';
+            box.style.background = type === 'error' ? '#fee2e2' : '#f0fdf4';
+            box.style.color = type === 'error' ? '#ef4444' : '#22c55e';
+            setTimeout(() => { box.style.display = 'none'; }, 5000);
         }
 
         async function connectWallet() {
             if (window.ethereum) {
+                web3 = new Web3(window.ethereum);
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 userAccount = accounts[0];
-                web3 = new Web3(window.ethereum);
                 document.getElementById('connectButton').innerText = userAccount.slice(0,6)+'...'+userAccount.slice(-4);
-                showNotify("Đã kết nối ví!");
-                // Gọi hàm updateBalances() của bạn ở đây
+                checkNetwork();
+                updateBalances();
             } else {
-                showNotify("Vui lòng cài đặt MetaMask", true);
+                showNotify("Please install MetaMask!", "error");
             }
+        }
+
+        async function checkNetwork() {
+            const chainId = await web3.eth.getChainId();
+            if (chainId === 56) {
+                isNetworkValid = true;
+                document.getElementById('networkStatus').innerText = "BSC Mainnet";
+                document.getElementById('networkStatus').className = "text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-green-500/50 text-green-500";
+            } else {
+                try {
+                    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] });
+                } catch(e) { showNotify("Please switch to BSC Network", "error"); }
+            }
+        }
+
+        async function handleBuyAction() {
+            if (!userAccount) return connectWallet();
+            const amount = document.getElementById('usdtAmount').value;
+            if (amount <= 0) return showNotify("Enter a valid amount", "error");
+
+            const amountWei = web3.utils.toWei(amount.toString(), 'ether');
+            const usdt = new web3.eth.Contract(usdtABI, usdtContractAddress);
+            const presale = new web3.eth.Contract(presaleABI, contractAddress);
+
+            try {
+                showNotify("Checking allowance...");
+                const allowance = await usdt.methods.allowance(userAccount, contractAddress).call();
+                
+                if (BigInt(allowance) < BigInt(amountWei)) {
+                    showNotify("Please confirm APPROVE in your wallet");
+                    await usdt.methods.approve(contractAddress, amountWei).send({ from: userAccount });
+                    showNotify("Approve success! Now confirm STAKE.");
+                }
+
+                showNotify("Confirming transaction...");
+                await presale.methods.buyTokens(amountWei).send({ from: userAccount });
+                showNotify("Purchase Successful!", "success");
+                updateBalances();
+            } catch (e) {
+                showNotify("Transaction Failed", "error");
+            }
+        }
+
+        async function updateBalances() {
+            if (!userAccount) return;
+            const usdt = new web3.eth.Contract(usdtABI, usdtContractAddress);
+            const bal = await usdt.methods.balanceOf(userAccount).call();
+            document.getElementById('usdtBalance').innerText = parseFloat(web3.utils.fromWei(bal, 'ether')).toFixed(2);
         }
 
         function calculateMomas() {
             const val = document.getElementById('usdtAmount').value;
-            document.getElementById('estMomas').innerText = (val * 10).toLocaleString() + " MOMAS";
+            document.getElementById('momasAmount').innerText = (val * 10).toLocaleString() + " MOMAS";
         }
 
-        function setMax() {
-            document.getElementById('usdtAmount').value = document.getElementById('usdtBalance').innerText;
-            calculateMomas();
-        }
+        // Countdown Logic
+        const END_DATE = new Date("Jan 7, 2026 00:00:00 GMT-0500").getTime();
+        setInterval(() => {
+            const now = new Date().getTime();
+            const d = END_DATE - now;
+            document.getElementById('days').innerText = Math.floor(d/(1000*60*60*24));
+            document.getElementById('hours').innerText = Math.floor((d%(1000*60*60*24))/(1000*60*60));
+            document.getElementById('minutes').innerText = Math.floor((d%(1000*60*60))/(1000*60));
+            document.getElementById('seconds').innerText = Math.floor((d%(1000*60))/1000);
+        }, 1000);
     </script>
 </body>
 </html>
