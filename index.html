@@ -17,7 +17,6 @@
             display: flex;
             flex-direction: column;
         }
-        /* Hiệu ứng nền mờ ảo */
         body::before {
             content: '';
             position: fixed;
@@ -31,10 +30,9 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 24px;
         }
-        /* Countdown Style */
         .countdown-segment {
             background: rgba(255, 255, 255, 0.05);
-            color: #f0b90b; /* Binance Yellow */
+            color: #f0b90b;
             font-weight: 700;
             font-size: 1.25rem;
             padding: 10px;
@@ -43,27 +41,19 @@
             text-align: center;
             border: 1px solid rgba(240, 185, 11, 0.2);
         }
-        /* Tinh chỉnh Social Icon gọn gàng */
         .social-icon {
             font-size: 1.2rem;
             color: #6b7280;
             transition: all 0.3s ease;
             padding: 10px;
         }
-        .social-icon:hover {
-            color: #fff;
-            transform: translateY(-2px);
-        }
-        /* Sponsor logos gọn gàng */
+        .social-icon:hover { color: #fff; transform: translateY(-2px); }
         .sponsor-logo {
             height: 25px;
             filter: grayscale(1) opacity(0.4);
             transition: all 0.5s ease;
         }
-        .sponsor-logo:hover {
-            filter: grayscale(0) opacity(1);
-        }
-        /* Notification Box */
+        .sponsor-logo:hover { filter: grayscale(0) opacity(1); }
         .notification-box {
             display: none;
             position: fixed;
@@ -89,7 +79,7 @@
             </div>
         </div>
         <div class="flex items-center gap-4">
-            <div id="networkStatus" class="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-red-500/50 text-red-500">Wrong Network</div>
+            <div id="networkStatus" class="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-red-500/50 text-red-500">Not Connected</div>
             <button id="connectButton" onclick="connectWallet()" class="bg-white text-black px-6 py-2 rounded-full text-sm font-bold hover:bg-gray-200 transition">Connect Wallet</button>
         </div>
     </nav>
@@ -98,18 +88,21 @@
         <div class="w-full max-w-lg">
             
             <div class="stake-card-bg p-8 mb-12 shadow-2xl">
-                <h2 class="text-2xl font-bold text-white mb-8">Stake USDT to Momas</h2>
+                <h2 class="text-2xl font-bold text-white mb-8 text-center">Stake USDT to Momas</h2>
                 
                 <div class="space-y-6">
                     <div class="flex justify-between items-end">
-                        <div>
-                            <p class="text-[10px] font-bold text-gray-500 uppercase mb-2">Input Amount</p>
-                            <input type="number" id="usdtAmount" oninput="calculateMomas()" class="bg-transparent text-3xl font-bold text-white outline-none w-full" placeholder="0.0">
+                        <div class="w-full">
+                            <p class="text-[10px] font-bold text-gray-500 uppercase mb-2">Input Amount (USDT)</p>
+                            <input type="number" id="usdtAmount" oninput="calculateMomas()" step="0.1" min="0" 
+                                   class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-2xl font-bold text-white outline-none w-full focus:ring-2 focus:ring-purple-500" 
+                                   placeholder="0.0">
                         </div>
-                        <div class="text-right">
-                            <p class="text-[10px] font-bold text-gray-500 uppercase mb-1">USDT Balance</p>
-                            <p class="font-bold text-white" id="usdtBalance">0.00</p>
-                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center px-2">
+                        <span class="text-[10px] font-bold text-gray-500 uppercase">USDT Balance</span>
+                        <span class="font-bold text-white" id="usdtBalance">0.00</span>
                     </div>
 
                     <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
@@ -119,7 +112,7 @@
                         </div>
                     </div>
 
-                    <button id="approveButton" onclick="handleBuyAction()" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-purple-900/20 transition-all">
+                    <button id="mainButton" onclick="handleBuyAction()" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-4 rounded-2xl font-bold text-lg shadow-lg transition-all">
                         Approve & Buy Momas
                     </button>
 
@@ -151,12 +144,11 @@
             <a href="#" class="social-icon"><i class="fab fa-telegram-plane"></i></a>
             <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
             <a href="#" class="social-icon"><i class="fab fa-discord"></i></a>
-            <a href="#" class="social-icon"><i class="fas fa-book"></i></a>
         </div>
         <p class="text-[10px] text-gray-600">© 2025 Momas Network. All Rights Reserved.</p>
     </footer>
 
-    <div id="notificationBox" class="notification-box bg-white text-black">
+    <div id="notificationBox" class="notification-box">
         <p id="notificationMessage" class="text-sm font-bold"></p>
     </div>
 
@@ -164,11 +156,9 @@
     <script>
         let web3;
         let userAccount;
-        let isNetworkValid = false;
         const contractAddress = '0xd3D61008559AcdE3bb6984431E77cA2Fd648aB02';
-        const usdtContractAddress = '0x55d398326f99059fF775485246999027B3197955';
+        const usdtContractAddress = '0x55d398326f99059fF775485246999027B3197955'; // USDT BEP20
 
-        // ABI rút gọn
         const usdtABI = [
             {"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"},
             {"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"type":"function"},
@@ -180,7 +170,8 @@
 
         function showNotify(msg, type='info') {
             const box = document.getElementById('notificationBox');
-            document.getElementById('notificationMessage').innerText = msg;
+            const txt = document.getElementById('notificationMessage');
+            txt.innerText = msg;
             box.style.display = 'block';
             box.style.background = type === 'error' ? '#fee2e2' : '#f0fdf4';
             box.style.color = type === 'error' ? '#ef4444' : '#22c55e';
@@ -190,26 +181,24 @@
         async function connectWallet() {
             if (window.ethereum) {
                 web3 = new Web3(window.ethereum);
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                userAccount = accounts[0];
-                document.getElementById('connectButton').innerText = userAccount.slice(0,6)+'...'+userAccount.slice(-4);
-                checkNetwork();
-                updateBalances();
-            } else {
-                showNotify("Please install MetaMask!", "error");
-            }
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    userAccount = accounts[0];
+                    document.getElementById('connectButton').innerText = userAccount.slice(0,6)+'...'+userAccount.slice(-4);
+                    checkNetwork();
+                    updateBalances();
+                } catch (e) { showNotify("Wallet connection denied", "error"); }
+            } else { showNotify("Please install MetaMask!", "error"); }
         }
 
         async function checkNetwork() {
             const chainId = await web3.eth.getChainId();
             if (chainId === 56) {
-                isNetworkValid = true;
                 document.getElementById('networkStatus').innerText = "BSC Mainnet";
                 document.getElementById('networkStatus').className = "text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-green-500/50 text-green-500";
             } else {
-                try {
-                    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] });
-                } catch(e) { showNotify("Please switch to BSC Network", "error"); }
+                showNotify("Please switch to BSC Network", "error");
+                await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] });
             }
         }
 
@@ -223,18 +212,21 @@
             const presale = new web3.eth.Contract(presaleABI, contractAddress);
 
             try {
-                showNotify("Checking allowance...");
                 const allowance = await usdt.methods.allowance(userAccount, contractAddress).call();
                 
                 if (BigInt(allowance) < BigInt(amountWei)) {
-                    showNotify("Please confirm APPROVE in your wallet");
+                    showNotify("Step 1: Approve USDT usage...");
                     await usdt.methods.approve(contractAddress, amountWei).send({ from: userAccount });
-                    showNotify("Approve success! Now confirm STAKE.");
+                    showNotify("Approved! Click again to Stake.", "success");
+                    return;
                 }
 
-                showNotify("Confirming transaction...");
-                await presale.methods.buyTokens(amountWei).send({ from: userAccount });
-                showNotify("Purchase Successful!", "success");
+                showNotify("Step 2: Confirming transaction...");
+                await presale.methods.buyTokens(amountWei).send({ 
+                    from: userAccount,
+                    gas: 150000 
+                });
+                showNotify("Stake Successful!", "success");
                 updateBalances();
             } catch (e) {
                 showNotify("Transaction Failed", "error");
@@ -250,18 +242,18 @@
 
         function calculateMomas() {
             const val = document.getElementById('usdtAmount').value;
-            document.getElementById('momasAmount').innerText = (val * 10).toLocaleString() + " MOMAS";
+            const res = val ? (val * 10).toLocaleString() : "0.0";
+            document.getElementById('momasAmount').innerText = res + " MOMAS";
         }
 
-        // Countdown Logic
-        const END_DATE = new Date("Jan 7, 2026 00:00:00 GMT-0500").getTime();
+        const END_DATE = new Date("Jan 7, 2026 00:00:00").getTime();
         setInterval(() => {
             const now = new Date().getTime();
             const d = END_DATE - now;
-            document.getElementById('days').innerText = Math.floor(d/(1000*60*60*24));
-            document.getElementById('hours').innerText = Math.floor((d%(1000*60*60*24))/(1000*60*60));
-            document.getElementById('minutes').innerText = Math.floor((d%(1000*60*60))/(1000*60));
-            document.getElementById('seconds').innerText = Math.floor((d%(1000*60))/1000);
+            document.getElementById('days').innerText = String(Math.floor(d/(1000*60*60*24))).padStart(2, '0');
+            document.getElementById('hours').innerText = String(Math.floor((d%(1000*60*60*24))/(1000*60*60))).padStart(2, '0');
+            document.getElementById('minutes').innerText = String(Math.floor((d%(1000*60*60))/(1000*60))).padStart(2, '0');
+            document.getElementById('seconds').innerText = String(Math.floor((d%(1000*60))/1000)).padStart(2, '0');
         }, 1000);
     </script>
 </body>
