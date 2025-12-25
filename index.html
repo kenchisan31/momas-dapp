@@ -10,89 +10,79 @@
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; color: #111827; }
-        .sidebar { width: 260px; border-right: 1px solid #e5e7eb; background: #fff; height: 100vh; position: fixed; left: 0; top: 0; }
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; color: #111827; margin: 0; }
+        .sidebar { width: 260px; border-right: 1px solid #e5e7eb; background: #fff; height: 100vh; position: fixed; left: 0; top: 0; z-index: 50; }
         .main-content { margin-left: 260px; width: calc(100% - 260px); min-height: 100vh; }
-        .glass-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .status-msg { transition: all 0.3s ease; padding: 12px; border-radius: 12px; margin-top: 16px; font-size: 13px; font-weight: 500; text-align: center; display: none; }
+        .glass-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         
-        @media (max-width: 768px) {
-            .sidebar { display: none; }
-            .main-content { margin-left: 0; width: 100%; }
-        }
+        /* Thông báo chuyên nghiệp dưới nút */
+        .status-container { margin-top: 16px; min-height: 50px; }
+        .status-msg { display: none; padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 500; text-align: center; animation: fadeIn 0.3s ease; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; width: 100%; } }
     </style>
 </head>
 <body>
 
     <aside class="sidebar p-6 flex flex-col">
         <div class="flex items-center gap-3 mb-10 px-2">
-            <img src="https://momas.net/logo.png" class="w-8 h-8 rounded-lg" onerror="this.src='https://placehold.co/32x32?text=M'">
+            <div class="w-8 h-8 bg-black rounded flex items-center justify-center"><i class="fas fa-diamond text-white text-xs"></i></div>
             <span class="font-bold text-xl tracking-tight">MOMAS</span>
         </div>
         <nav class="space-y-1">
-            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 rounded-xl transition"><i class="fas fa-home w-5"></i> Home</a>
-            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 rounded-xl transition"><i class="fas fa-microchip w-5"></i> My Nodes</a>
-            <a href="#" class="flex items-center gap-3 px-4 py-3 text-purple-600 bg-purple-50 rounded-xl font-semibold"><i class="fas fa-layer-group w-5"></i> Staking</a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-50 rounded-xl transition"><i class="fas fa-home w-5"></i> Home</a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-50 rounded-xl transition"><i class="fas fa-server w-5"></i> My Nodes</a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-black bg-gray-100 rounded-xl font-semibold"><i class="fas fa-percentage w-5"></i> Staking</a>
         </nav>
     </aside>
 
     <div class="main-content">
-        <header class="h-16 border-b border-gray-100 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 sticky top-0 z-10">
+        <header class="h-16 border-b border-gray-100 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 sticky top-0 z-40">
             <p class="text-sm text-gray-400">Staking - <span class="text-gray-600">Stake BLESS and earn rewards</span></p>
-            <button id="connectButton" class="bg-gray-900 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-black transition">Connect Wallet</button>
+            <button id="connectButton" onclick="connectWallet()" class="bg-gray-900 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-black transition">Connect Wallet</button>
         </header>
 
         <main class="max-w-4xl mx-auto p-8">
-            <div class="mb-8">
-                <h1 class="text-2xl font-bold">Currently Earning</h1>
-            </div>
+            <h1 class="text-2xl font-bold mb-8">Currently Earning</h1>
 
             <div class="glass-card p-10 max-w-xl mx-auto">
                 <div class="flex justify-between items-center mb-10">
                     <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
-                            <i class="fas fa-gem text-purple-600 text-xl"></i>
-                        </div>
+                        <div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center"><i class="fas fa-coins text-black text-xl"></i></div>
                         <div>
-                            <h3 class="font-bold text-lg">MOMAS</h3>
+                            <h3 class="font-bold text-lg">BLESS</h3>
                             <p class="text-xs text-gray-400">Immediate unlock</p>
                         </div>
                     </div>
                     <div class="text-right">
                         <p class="text-2xl font-bold" id="momasAmount">0.00</p>
-                        <p class="text-xs text-gray-400 font-medium">$0.00</p>
+                        <p class="text-xs text-gray-400 font-medium" id="usdValue">$0.00</p>
                     </div>
                 </div>
 
                 <div class="space-y-6 mb-8">
-                    <div class="flex justify-between items-end">
-                        <label class="text-xs font-bold text-gray-400 uppercase">Input USDT</label>
-                        <span class="text-xs font-semibold text-gray-500">Balance: <span id="usdtBalance">0.00</span></span>
-                    </div>
+                    <div class="flex justify-between px-1"><label class="text-xs font-bold text-gray-400 uppercase">Input USDT</label> <span class="text-xs font-semibold text-gray-500">Balance: <span id="usdtBalance">0.00</span></span></div>
                     <div class="relative">
-                        <input type="number" id="usdtAmount" class="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-xl font-bold outline-none focus:ring-2 ring-purple-100 transition" placeholder="0.00">
-                        <button onclick="setMax()" class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-purple-600 bg-white px-3 py-1.5 rounded-lg border border-gray-100">MAX</button>
+                        <input type="number" id="usdtAmount" oninput="updateEst()" class="w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-4 text-xl font-bold outline-none focus:border-black transition" placeholder="0.00">
+                        <button onclick="setMax()" class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-black border border-gray-200 px-3 py-1.5 rounded-lg bg-white">MAX</button>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="text-center p-4 bg-gray-50 rounded-2xl">
-                            <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Current APY</p>
-                            <p class="font-bold text-green-500">-%</p>
-                        </div>
-                        <div class="text-center p-4 bg-gray-50 rounded-2xl">
-                            <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Estimated Total</p>
-                            <p class="font-bold text-purple-600" id="estMomas">0.00 MOMAS</p>
-                        </div>
+                        <div class="p-4 bg-gray-50 rounded-2xl text-center"><p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Current APY</p><p class="font-bold text-green-500">~ 12.5%</p></div>
+                        <div class="p-4 bg-gray-50 rounded-2xl text-center"><p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Estimated Total</p><p class="font-bold text-black" id="estMomas">0.00 BLESS</p></div>
                     </div>
                 </div>
 
-                <button id="approveButton" class="w-full bg-gray-900 text-white py-4 rounded-2xl font-bold text-lg hover:bg-black transition-all active:scale-95 shadow-lg shadow-gray-200">
+                <button id="approveButton" onclick="handleAction()" class="w-full bg-black text-white py-5 rounded-2xl font-bold text-lg hover:opacity-90 transition active:scale-[0.98]">
                     Approve & Stake
                 </button>
                 
-                <div id="statusBox" class="status-msg"></div>
+                <div class="status-container">
+                    <div id="statusBox" class="status-msg"></div>
+                </div>
 
-                <div class="mt-8 text-center">
-                    <p id="walletAddressDisplay" class="text-[11px] text-gray-300 font-mono tracking-widest uppercase">Wallet not connected</p>
+                <div class="mt-4 text-center">
+                    <p id="walletDisplay" class="text-[10px] text-gray-300 font-mono break-all">NOT CONNECTED</p>
                 </div>
             </div>
         </main>
@@ -101,122 +91,109 @@
     <script>
         let web3;
         let userAccount;
-        const BSC_RPC = "https://bsc-dataseed.binance.org/";
-        const CHAIN_ID = 56; // BSC Mainnet
+        const CHAIN_ID = 56; // BSC Mainnet (0x38)
+        const RATE = 10; // 1 USDT = 10 BLESS
 
-        // Hàm hiển thị thông báo chuyên nghiệp
-        function showStatus(msg, isError = false) {
+        function showStatus(msg, type = 'info') {
             const box = document.getElementById('statusBox');
             box.innerText = msg;
             box.style.display = 'block';
-            if (isError) {
-                box.style.backgroundColor = '#fef2f2';
-                box.style.color = '#dc2626';
-                box.style.border = '1px solid #fee2e2';
-            } else {
-                box.backgroundColor = '#f0fdf4';
-                box.style.color = '#16a34a';
-                box.style.border = '1px solid #dcfce7';
-            }
+            box.style.backgroundColor = type === 'error' ? '#fef2f2' : '#f0fdf4';
+            box.style.color = type === 'error' ? '#dc2626' : '#16a34a';
+            box.style.border = type === 'error' ? '1px solid #fee2e2' : '1px solid #dcfce7';
         }
 
-        // Tự động yêu cầu chuyển mạng nếu sai
         async function switchNetwork() {
             try {
                 await window.ethereum.request({
                     method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: '0x38' }], // 0x38 là 56 trong hex
+                    params: [{ chainId: '0x38' }],
                 });
                 return true;
-            } catch (switchError) {
-                // Nếu mạng BSC chưa có trong ví, yêu cầu thêm vào
-                if (switchError.code === 4902) {
-                    try {
-                        await window.ethereum.request({
-                            method: 'wallet_addEthereumChain',
-                            params: [{
-                                chainId: '0x38',
-                                chainName: 'Binance Smart Chain',
-                                nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
-                                rpcUrls: [BSC_RPC],
-                                blockExplorerUrls: ['https://bscscan.com/']
-                            }]
-                        });
-                        return true;
-                    } catch (addError) { return false; }
+            } catch (err) {
+                if (err.code === 4902) {
+                    showStatus("Vui lòng thêm mạng BSC vào ví.", "error");
                 }
                 return false;
             }
         }
 
         async function connectWallet() {
-            if (window.ethereum) {
-                web3 = new Web3(window.ethereum);
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                userAccount = accounts[0];
-                
-                const chainId = await web3.eth.getChainId();
-                if (chainId !== CHAIN_ID) {
-                    showStatus("Wrong Network! Please switch to BSC.", true);
-                    await switchNetwork();
-                } else {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    // Bước 1: Yêu cầu mở ví ngay lập tức
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    userAccount = accounts[0];
+                    web3 = new Web3(window.ethereum);
+
+                    // Bước 2: Kiểm tra mạng
+                    const chainId = await web3.eth.getChainId();
+                    if (chainId !== CHAIN_ID) {
+                        showStatus("Đang yêu cầu chuyển mạng BSC...", "error");
+                        const switched = await switchNetwork();
+                        if (!switched) return;
+                    }
+
                     document.getElementById('connectButton').innerText = userAccount.slice(0,6)+'...'+userAccount.slice(-4);
-                    document.getElementById('walletAddressDisplay').innerText = userAccount;
-                    showStatus("Wallet connected successfully!");
+                    document.getElementById('walletDisplay').innerText = userAccount;
+                    showStatus("Đã kết nối ví thành công!");
                     updateBalances();
+                } catch (error) {
+                    showStatus("Người dùng từ chối kết nối ví.", "error");
                 }
             } else {
-                showStatus("Please install MetaMask!", true);
+                showStatus("Không tìm thấy ví Web3. Vui lòng cài đặt MetaMask.", "error");
             }
         }
 
-        document.getElementById('usdtAmount').oninput = function() {
-            const val = this.value || 0;
-            document.getElementById('estMomas').innerText = (val * 10).toFixed(2) + " MOMAS";
-        };
-
-        function setMax() {
-            const b = document.getElementById('usdtBalance').innerText;
-            document.getElementById('usdtAmount').value = b;
-        }
-
-        async function updateBalances() {
-            // Chèn logic lấy balance USDT/MOMAS thật của bạn vào đây
-            document.getElementById('usdtBalance').innerText = "100.00"; 
-        }
-
-        // Nút nhấn Approve & Stake
-        document.getElementById('approveButton').onclick = async function() {
+        async function handleAction() {
+            // Nếu chưa kết nối, ưu tiên gọi connect trước
             if (!userAccount) {
                 await connectWallet();
                 return;
             }
 
+            // Ép kiểm tra mạng lại lần nữa trước khi thực hiện giao dịch
             const chainId = await web3.eth.getChainId();
             if (chainId !== CHAIN_ID) {
-                showStatus("Switching network...", true);
-                const success = await switchNetwork();
-                if(!success) return;
+                await switchNetwork();
+                return;
             }
 
             const amount = document.getElementById('usdtAmount').value;
             if (amount <= 0) {
-                showStatus("Please enter a valid amount", true);
+                showStatus("Vui lòng nhập số lượng hợp lệ.", "error");
                 return;
             }
 
-            showStatus("Waiting for wallet confirmation...");
+            showStatus("Đang đợi xác nhận từ ví...");
             
-            // --- ĐOẠN NÀY BẠN DÁN CODE SMART CONTRACT CỦA BẠN VÀO ---
-            // const contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
-            // await contract.methods.approve(SPENDER, amount).send({ from: userAccount });
-            // --- TÔI SẼ ĐỂ GIẢ LẬP ĐỂ BẠN THẤY THÔNG BÁO CHẠY ---
-            setTimeout(() => {
-                showStatus("Transaction successful! Momas Staked.");
-            }, 2000);
-        };
+            // --- PHẦN GỌI SMART CONTRACT CỦA BẠN ---
+            try {
+                // Ví dụ: await usdtContract.methods.approve(stakingAddress, amountWei).send({ from: userAccount });
+                // Tạm thời giả lập để bạn thấy quy trình:
+                setTimeout(() => {
+                    showStatus("Giao dịch thành công! Đang staking...");
+                }, 2000);
+            } catch (e) {
+                showStatus("Giao dịch bị từ chối hoặc thất bại.", "error");
+            }
+        }
 
-        document.getElementById('connectButton').onclick = connectWallet;
+        function updateEst() {
+            const val = document.getElementById('usdtAmount').value;
+            document.getElementById('estMomas').innerText = (val * RATE).toFixed(2) + " BLESS";
+        }
+
+        function setMax() {
+            document.getElementById('usdtAmount').value = document.getElementById('usdtBalance').innerText;
+            updateEst();
+        }
+
+        async function updateBalances() {
+            // Giả lập cập nhật số dư - bạn thay bằng logic web3.eth.call thực tế
+            document.getElementById('usdtBalance').innerText = "250.00";
+        }
     </script>
 </body>
 </html>
