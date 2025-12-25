@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Momas DApp - Professional Dashboard</title>
+    <title>Momas DApp - One-Click Buy</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -13,6 +13,7 @@
         .glass-card { background: rgba(22, 30, 46, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .sidebar-active { transform: translateX(0) !important; }
         .mobile-overlay { background: rgba(0,0,0,0.5); display: none; position: fixed; inset: 0; z-index: 40; }
+        input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -25,33 +26,30 @@
                 <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
                     <i class="fas fa-bolt text-white"></i>
                 </div>
-                <h1 class="text-2xl font-bold tracking-tight">MOMAS</h1>
+                <h1 class="text-2xl font-bold tracking-tight italic">MOMAS</h1>
             </div>
             <button onclick="toggleSidebar()" class="md:hidden text-slate-400"><i class="fas fa-times"></i></button>
         </div>
-        
         <nav class="space-y-2">
             <a href="#" class="flex items-center gap-4 p-3 rounded-xl bg-blue-600/10 text-blue-500 font-bold"><i class="fas fa-th-large w-5"></i> Dashboard</a>
             <a href="#" class="flex items-center gap-4 p-3 rounded-xl text-slate-400 hover:bg-slate-800 transition"><i class="fas fa-coins w-5"></i> Buy Tokens</a>
-            <a href="#" class="flex items-center gap-4 p-3 rounded-xl text-slate-400 hover:bg-slate-800 transition"><i class="fas fa-project-diagram w-5"></i> Ecosystem</a>
         </nav>
-
         <div class="absolute bottom-10 left-6 right-6 p-4 glass-card rounded-2xl">
-            <p class="text-xs text-slate-500 mb-2">My Balance</p>
-            <p id="userBalance" class="text-sm font-bold tracking-wide text-blue-400">0.00 USDT</p>
+            <p class="text-xs text-slate-500 mb-1">My USDT Balance</p>
+            <p id="userBalance" class="text-sm font-bold text-blue-400">0.00 USDT</p>
         </div>
     </aside>
 
-    <div class="md:ml-72 transition-all">
+    <div class="md:ml-72">
         <header class="p-6 md:px-10 flex justify-between items-center sticky top-0 z-30 bg-[#0b0f1a]/80 backdrop-blur-md">
             <button onclick="toggleSidebar()" class="md:hidden text-2xl"><i class="fas fa-bars text-slate-400"></i></button>
             <div id="networkStatus" class="hidden md:block text-slate-400 text-sm font-semibold italic">Vui lòng kết nối ví</div>
             
-            <div class="flex items-center bg-slate-900 rounded-2xl border border-slate-800 p-1 gap-1">
-                <button id="connectBtn" onclick="connectWallet()" class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-xl font-bold transition shadow-lg shadow-blue-500/20 active:scale-95 whitespace-nowrap">
+            <div class="flex items-center bg-slate-900 rounded-2xl border border-slate-800 p-1">
+                <button id="connectBtn" onclick="connectWallet()" class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-xl font-bold transition shadow-lg shadow-blue-500/20 active:scale-95">
                     Connect Wallet
                 </button>
-                <button id="logoutBtn" onclick="logout()" class="hidden px-4 py-2 text-slate-400 hover:text-red-500 transition border-l border-slate-800" title="Đăng xuất">
+                <button id="logoutBtn" onclick="logout()" class="hidden px-4 text-slate-400 hover:text-red-500 transition border-l border-slate-800 ml-1">
                     <i class="fas fa-power-off"></i>
                 </button>
             </div>
@@ -59,52 +57,37 @@
 
         <main class="p-6 md:p-10 max-w-6xl mx-auto">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                <div class="glass-card rounded-3xl p-8 relative overflow-hidden">
-                    <div class="relative z-10">
-                        <h3 class="text-slate-400 text-xs font-bold uppercase mb-2">Quỹ đầu tư cộng đồng</h3>
-                        <div class="text-4xl font-bold mb-6 italic tracking-tight">65,240 <span class="text-lg text-slate-500 font-normal">/ 100,000 USDT</span></div>
-                        <div class="w-full bg-slate-900 h-3 rounded-full overflow-hidden mb-4 border border-slate-800">
-                            <div class="bg-gradient-to-r from-blue-600 to-blue-400 h-full w-[65%] rounded-full shadow-[0_0_20px_rgba(59,130,246,0.3)]"></div>
-                        </div>
-                        <div class="flex justify-between text-[10px] font-bold uppercase text-slate-500">
-                            <span>Phát triển hệ sinh thái Momas</span>
-                            <span>65% Đạt được</span>
-                        </div>
+                <div class="glass-card rounded-3xl p-8 border-t border-white/5">
+                    <h3 class="text-slate-400 text-xs font-bold uppercase mb-2">Presale Progress</h3>
+                    <div class="text-4xl font-bold mb-6 italic">65,240 <span class="text-lg text-slate-500 font-normal">/ 100k USDT</span></div>
+                    <div class="w-full bg-slate-900 h-3 rounded-full overflow-hidden border border-slate-800">
+                        <div class="bg-gradient-to-r from-blue-600 to-blue-400 h-full w-[65%] rounded-full shadow-[0_0_15px_rgba(59,130,246,0.3)]"></div>
                     </div>
                 </div>
 
-                <div class="glass-card rounded-3xl p-8 text-center border border-blue-500/10">
-                    <h3 class="text-blue-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-6">Kết thúc Presale sau</h3>
-                    <div id="countdown" class="flex justify-center gap-4">
-                        <div class="flex flex-col"><span class="text-3xl font-bold bg-slate-900 w-16 h-16 flex items-center justify-center rounded-2xl mb-2 border border-slate-800">02</span><span class="text-[10px] text-slate-500 font-bold">DAYS</span></div>
-                        <div class="flex flex-col"><span class="text-3xl font-bold bg-slate-900 w-16 h-16 flex items-center justify-center rounded-2xl mb-2 border border-slate-800">14</span><span class="text-[10px] text-slate-500 font-bold">HOURS</span></div>
-                        <div class="flex flex-col"><span class="text-3xl font-bold bg-slate-900 w-16 h-16 flex items-center justify-center rounded-2xl mb-2 border border-slate-800">45</span><span class="text-[10px] text-slate-500 font-bold">MINS</span></div>
+                <div class="glass-card rounded-3xl p-8 text-center">
+                    <h3 class="text-blue-500 text-[10px] font-bold uppercase tracking-widest mb-6">Ends in</h3>
+                    <div class="flex justify-center gap-4">
+                        <div class="flex flex-col"><span class="text-3xl font-bold bg-slate-900 w-16 h-16 flex items-center justify-center rounded-2xl mb-1">02</span><span class="text-[9px] text-slate-500">DAYS</span></div>
+                        <div class="flex flex-col"><span class="text-3xl font-bold bg-slate-900 w-16 h-16 flex items-center justify-center rounded-2xl mb-1">14</span><span class="text-[9px] text-slate-500">HOURS</span></div>
+                        <div class="flex flex-col"><span class="text-3xl font-bold bg-slate-900 w-16 h-16 flex items-center justify-center rounded-2xl mb-1">45</span><span class="text-[9px] text-slate-500">MINS</span></div>
                     </div>
                 </div>
             </div>
 
             <div class="max-w-xl mx-auto">
-                <div class="glass-card rounded-[2.5rem] p-8 md:p-10 shadow-2xl relative border-t border-white/5">
-                    <div class="flex justify-between items-center mb-8">
+                <div class="glass-card rounded-[2.5rem] p-8 shadow-2xl border-t border-white/5">
+                    <div class="flex justify-between items-center mb-10">
                         <h2 class="text-2xl font-bold italic tracking-tighter">BUY MOMAS</h2>
-                        <span class="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full font-bold">1 USDT = 10 MOMAS</span>
+                        <span class="text-[10px] bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full font-bold border border-blue-500/20">1 USDT = 10 MOMAS</span>
                     </div>
 
                     <div class="space-y-6">
-                        <div class="bg-slate-950/50 p-6 rounded-3xl border border-slate-800 group focus-within:border-blue-500 transition">
+                        <div class="bg-slate-950/50 p-6 rounded-3xl border border-slate-800">
                             <label class="text-[10px] text-slate-500 uppercase font-bold mb-2 block">Số lượng nạp</label>
                             <div class="flex items-center">
                                 <input type="number" id="usdtAmount" placeholder="0.0" class="bg-transparent text-2xl font-bold w-full outline-none" oninput="calculate()">
-                                <div class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-2xl">
-                                    <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="w-5 h-5" alt="USDT">
-                                    <span class="font-bold text-sm">USDT</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex justify-center -my-3 relative z-10">
-                            <div class="bg-blue-600 w-10 h-10 rounded-full flex items-center justify-center border-4 border-[#0b0f1a] shadow-lg shadow-blue-500/40">
-                                <i class="fas fa-arrow-down text-[10px] text-white"></i>
+                                <div class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-2xl font-bold text-sm">USDT</div>
                             </div>
                         </div>
 
@@ -112,20 +95,13 @@
                             <label class="text-[10px] text-slate-500 uppercase font-bold mb-2 block">Ước tính nhận</label>
                             <div class="flex items-center">
                                 <input type="text" id="tokenReceived" readonly placeholder="0.0" class="bg-transparent text-2xl font-bold w-full outline-none text-blue-400">
-                                <div class="flex items-center gap-2 bg-blue-600/10 px-4 py-1.5 rounded-2xl border border-blue-500/20">
-                                    <span class="font-bold text-sm text-blue-400">MOMAS</span>
-                                </div>
+                                <div class="flex items-center gap-2 bg-blue-600/10 px-3 py-1.5 rounded-2xl font-bold text-sm text-blue-400">MOMAS</div>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 gap-4 pt-4">
-                            <button id="approveBtn" onclick="handleApprove()" class="bg-slate-800 hover:bg-slate-700 p-5 rounded-2xl font-bold transition flex items-center justify-center gap-3">
-                                1. Approve USDT
-                            </button>
-                            <button id="buyBtn" onclick="handleBuy()" class="bg-blue-600 hover:bg-blue-700 p-5 rounded-2xl font-bold transition shadow-xl shadow-blue-600/20 flex items-center justify-center gap-3 active:scale-95 text-white">
-                                2. Confirm Purchase
-                            </button>
-                        </div>
+                        <button id="mainBtn" onclick="handleAction()" class="w-full bg-blue-600 hover:bg-blue-700 p-5 rounded-2xl font-bold transition shadow-xl shadow-blue-600/20 text-white active:scale-95 flex items-center justify-center gap-3">
+                            <span id="btnText">PROCEED TO PURCHASE</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -133,10 +109,9 @@
     </div>
 
     <script>
-        // --- CẤU HÌNH ---
         const SALE_ADDRESS = "0xd3D61008559AcdE3bb6984431E77cA2Fd648aB02";
         const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955";
-        const BSC_CHAIN_ID = "0x38"; // 56 Decimal
+        const BSC_CHAIN_ID = "0x38";
 
         let provider, signer;
 
@@ -145,146 +120,138 @@
             document.getElementById('overlay').classList.toggle('block');
         }
 
-        // --- HÀM ÉP ĐỔI MẠNG & THÊM MẠNG ---
         async function verifyNetwork() {
             const chainId = await window.ethereum.request({ method: 'eth_chainId' });
             if (chainId !== BSC_CHAIN_ID) {
                 try {
-                    await window.ethereum.request({
-                        method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: BSC_CHAIN_ID }],
-                    });
+                    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BSC_CHAIN_ID }] });
                     return true;
-                } catch (switchError) {
-                    if (switchError.code === 4902) {
-                        try {
-                            await window.ethereum.request({
-                                method: 'wallet_addEthereumChain',
-                                params: [{
-                                    chainId: BSC_CHAIN_ID,
-                                    chainName: 'BNB Smart Chain',
-                                    nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
-                                    rpcUrls: ['https://bsc-dataseed.binance.org/'],
-                                    blockExplorerUrls: ['https://bscscan.com/']
-                                }]
-                            });
-                            return true;
-                        } catch (addError) {
-                            alert("Vui lòng thêm mạng BSC vào ví để tiếp tục!");
-                            return false;
-                        }
+                } catch (e) {
+                    if (e.code === 4902) {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: BSC_CHAIN_ID,
+                                chainName: 'BNB Smart Chain',
+                                nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+                                rpcUrls: ['https://bsc-dataseed.binance.org/'],
+                                blockExplorerUrls: ['https://bscscan.com/']
+                            }]
+                        });
+                        return true;
                     }
-                    alert("Bạn cần chuyển sang mạng BSC để giao dịch!");
+                    alert("Hãy chuyển mạng BSC!");
                     return false;
                 }
             }
             return true;
         }
 
-        // --- QUẢN LÝ KẾT NỐI ---
         async function connectWallet() {
-            if (!window.ethereum) return alert("Vui lòng cài đặt MetaMask!");
-            
-            const isNetworkOk = await verifyNetwork();
-            if (!isNetworkOk) return;
+            if (!window.ethereum) return alert("Vui lòng cài MetaMask!");
+            const ok = await verifyNetwork();
+            if (!ok) return;
 
-            try {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                signer = provider.getSigner();
-                updateUI(accounts[0]);
-                localStorage.setItem('walletPreference', 'connected');
-            } catch (err) {
-                console.error("User rejected connection");
-            }
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+            signer = provider.getSigner();
+            updateUI(accounts[0]);
+            localStorage.setItem('walletPref', 'on');
         }
 
-        function updateUI(account) {
-            if (account) {
-                document.getElementById('connectBtn').innerText = account.substring(0,6) + "..." + account.substring(38);
-                document.getElementById('logoutBtn').classList.remove('hidden');
-                document.getElementById('networkStatus').innerHTML = "<span class='text-green-500'>● Connected to BSC</span>";
+        async function updateUI(acc) {
+            const btn = document.getElementById('connectBtn');
+            const status = document.getElementById('networkStatus');
+            const balance = document.getElementById('userBalance');
+            const logout = document.getElementById('logoutBtn');
+
+            if (acc) {
+                btn.innerText = acc.slice(0,6) + "..." + acc.slice(-4);
+                status.innerHTML = "<span class='text-green-500'>● Connected to BSC</span>";
+                logout.classList.remove('hidden');
                 
-                // Lấy số dư USDT (Giả lập hoặc gọi contract thật)
-                document.getElementById('userBalance').innerText = "Loading...";
-                getUSDTBalance(account);
+                try {
+                    const usdt = new ethers.Contract(USDT_ADDRESS, ["function balanceOf(address) view returns (uint256)"], provider);
+                    const b = await usdt.balanceOf(acc);
+                    balance.innerText = ethers.utils.formatUnits(b, 18) + " USDT";
+                } catch (e) { balance.innerText = "Error"; }
             } else {
-                document.getElementById('connectBtn').innerText = "Connect Wallet";
-                document.getElementById('logoutBtn').classList.add('hidden');
-                document.getElementById('networkStatus').innerText = "Vui lòng kết nối ví";
-                document.getElementById('userBalance').innerText = "0.00 USDT";
-            }
-        }
-
-        async function getUSDTBalance(account) {
-            try {
-                const contract = new ethers.Contract(USDT_ADDRESS, ["function balanceOf(address) view returns (uint256)"], provider);
-                const balance = await contract.balanceOf(account);
-                document.getElementById('userBalance').innerText = ethers.utils.formatUnits(balance, 18) + " USDT";
-            } catch (e) {
-                document.getElementById('userBalance').innerText = "Error";
+                btn.innerText = "Connect Wallet";
+                status.innerText = "Vui lòng kết nối ví";
+                logout.classList.add('hidden');
+                balance.innerText = "0.00 USDT";
             }
         }
 
         function logout() {
-            localStorage.setItem('walletPreference', 'disconnected');
+            localStorage.setItem('walletPref', 'off');
             updateUI(null);
-            alert("Đã ngắt kết nối phiên làm việc.");
         }
 
         function calculate() {
-            const amount = document.getElementById('usdtAmount').value;
-            document.getElementById('tokenReceived').value = amount ? (amount * 10).toLocaleString() : "0.0";
+            const val = document.getElementById('usdtAmount').value;
+            document.getElementById('tokenReceived').value = val ? (val * 10).toLocaleString() : "0.0";
         }
 
-        // --- XỬ LÝ GIAO DỊCH (Giữ nguyên logic của bạn) ---
-        async function handleApprove() {
+        // --- LOGIC GỘP NÚT BẤM THÔNG MINH ---
+        async function handleAction() {
             if (!signer) return connectWallet();
-            const amount = document.getElementById('usdtAmount').value;
-            if (!amount) return alert("Nhập số tiền!");
+            
+            const amt = document.getElementById('usdtAmount').value;
+            if (!amt || amt <= 0) return alert("Nhập số tiền!");
+
+            const amountWei = ethers.utils.parseUnits(amt, 18);
+            const usdt = new ethers.Contract(USDT_ADDRESS, [
+                "function allowance(address,address) view returns (uint256)", 
+                "function approve(address,uint256) returns (bool)"
+            ], signer);
+            const user = await signer.getAddress();
+            const mainBtn = document.getElementById('mainBtn');
 
             try {
-                const contract = new ethers.Contract(USDT_ADDRESS, ["function approve(address spender, uint256 amount) public returns (bool)"], signer);
-                const tx = await contract.approve(SALE_ADDRESS, ethers.utils.parseUnits(amount, 18));
-                alert("Đang xử lý Approve...");
-                await tx.wait();
-                alert("Approve thành công!");
-            } catch (err) { alert("Lỗi Approve!"); }
+                mainBtn.disabled = true;
+                mainBtn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Processing...";
+
+                const allowance = await usdt.allowance(user, SALE_ADDRESS);
+
+                // BƯỚC 1: APPROVE NẾU CẦN
+                if (allowance.lt(amountWei)) {
+                    alert("Bước 1: Bạn cần ký ví để Ủy quyền chi tiêu USDT.");
+                    const txA = await usdt.approve(SALE_ADDRESS, ethers.constants.MaxUint256);
+                    await txA.wait();
+                    alert("Approve thành công! Hãy ký thêm 1 lần nữa để xác nhận Mua.");
+                }
+
+                // BƯỚC 2: MUA LUÔN
+                const sale = new ethers.Contract(SALE_ADDRESS, ["function buyTokens(uint256) public"], signer);
+                const txB = await sale.buyTokens(amountWei);
+                alert("Bước 2: Đang thực hiện giao dịch Mua...");
+                await txB.wait();
+                
+                alert("Giao dịch hoàn tất rực rỡ!");
+                updateUI(user);
+            } catch (e) {
+                alert("Lỗi: Kiểm tra số dư hoặc bạn đã hủy giao dịch.");
+            } finally {
+                mainBtn.disabled = false;
+                mainBtn.innerText = "PROCEED TO PURCHASE";
+            }
         }
 
-        async function handleBuy() {
-            if (!signer) return connectWallet();
-            const amount = document.getElementById('usdtAmount').value;
-            if (!amount) return alert("Nhập số tiền!");
-
-            try {
-                const contract = new ethers.Contract(SALE_ADDRESS, ["function buyTokens(uint256 usdtAmount) public"], signer);
-                const tx = await contract.buyTokens(ethers.utils.parseUnits(amount, 18));
-                alert("Đang thực hiện mua...");
-                await tx.wait();
-                alert("Thành công! USDT đã được gửi đến ví Owner.");
-            } catch (err) { alert("Lỗi giao dịch!"); }
-        }
-
-        // Tự động nhận diện khi vào trang
         window.addEventListener('load', async () => {
-            if (localStorage.getItem('walletPreference') === 'connected' && window.ethereum) {
-                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-                if (accounts.length > 0) {
+            if (localStorage.getItem('walletPref') === 'on' && window.ethereum) {
+                const accs = await window.ethereum.request({ method: 'eth_accounts' });
+                if (accs.length > 0) {
                     provider = new ethers.providers.Web3Provider(window.ethereum);
                     signer = provider.getSigner();
-                    updateUI(accounts[0]);
+                    updateUI(accs[0]);
                 }
             }
         });
 
-        // Lắng nghe thay đổi mạng/ví
         if (window.ethereum) {
             window.ethereum.on('chainChanged', () => window.location.reload());
-            window.ethereum.on('accountsChanged', (accs) => {
-                if (accs.length === 0) logout();
-                else updateUI(accs[0]);
-            });
+            window.ethereum.on('accountsChanged', (a) => a.length === 0 ? logout() : updateUI(a[0]));
         }
     </script>
 </body>
